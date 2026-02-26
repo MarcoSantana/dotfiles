@@ -39,6 +39,9 @@
     pkgs.btop
     pkgs.espanso
     pkgs.du-dust
+    pkgs.xh
+    pkgs.doggo
+    pkgs.insomnia
   ];
 
   programs.home-manager.enable = true;
@@ -54,6 +57,30 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+  };
+
+  # Modern Shell Suite & Aliases
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+    shellAliases = {
+      ls = "eza --icons";
+      l = "eza -l --icons";
+      la = "eza -la --icons";
+      lt = "eza --tree --icons";
+      cat = "bat";
+      find = "fd";
+      du = "dust";
+      ps = "procs";
+      top = "btop";
+      diff = "delta";
+    };
+    initExtra = ''
+      # Preserve existing .zshrc logic
+      source ~/dotfiles/zsh/.zshrc
+    '';
   };
 
   programs.emacs = {                              

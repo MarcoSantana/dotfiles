@@ -112,9 +112,12 @@
       firefox
       chromium
       google-chrome
+      brave
+      microsoft-edge
       vscodium
       gitnuro
       dbeaver
+      ngrok
 
       # Development Environments
       # Node.js
@@ -196,6 +199,10 @@
 
   # Enable Tailscale
   services.tailscale.enable = true;
+
+  # Enable Docker
+  virtualisation.docker.enable = true;
+  users.users.msantana.extraGroups = [ "networkmanager" "wheel" "docker" ];
 
   # Fonts
   fonts.packages = with pkgs; [
