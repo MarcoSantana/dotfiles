@@ -54,6 +54,10 @@
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
+  # Enable EXWM
+  services.xserver.windowManager.exwm.enable = true;
+  services.xserver.displayManager.defaultSession = "nixos-exwm";
+
   # Configure keymap in X11
   services.xserver = {
     layout = "us";
@@ -85,7 +89,7 @@
 
   services.emacs = {
     enable = true;
-    package = pkgs.emacs;
+    package = pkgs.emacs-unstable; # From overlay
   };
 
   # Define a user account.
@@ -174,7 +178,7 @@
     neovim
     wget
     git
-    emacs # From overlay
+    emacs-unstable # From overlay
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
