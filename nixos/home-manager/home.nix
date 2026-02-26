@@ -39,6 +39,7 @@
 
   programs.emacs = {                              
 	  enable = true;
+    package = pkgs.emacs-unstable;
 	  extraPackages = epkgs: [
 		  epkgs.nix-mode
 		  epkgs.magit
