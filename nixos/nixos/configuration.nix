@@ -162,6 +162,13 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # Home Manager Configuration
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.msantana = import ../home-manager/home.nix;
+  };
+
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
     neovim
