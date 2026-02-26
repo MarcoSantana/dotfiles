@@ -10,6 +10,7 @@ return {
   { import = "astrocommunity.pack.html-css" },
   { import = "astrocommunity.pack.laravel" }, 
   { import = "astrocommunity.pack.markdown" },
+  { import = "astrocommunity.pack.clojure" }, 
   { import = "astrocommunity.pack.php" }, 
   { import = "astrocommunity.pack.ruby" },
   { import = "astrocommunity.pack.typescript" }, 
