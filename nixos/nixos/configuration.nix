@@ -113,6 +113,7 @@
       maestral
       maestral-gui
       logseq
+      syncthing
 
       # Desktop Apps
       firefox
@@ -193,6 +194,14 @@
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
+
+  # Enable Syncthing
+  services.syncthing = {
+    enable = true;
+    user = "msantana";
+    dataDir = "/home/msantana";
+    configDir = "/home/msantana/.config/syncthing";
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
