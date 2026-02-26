@@ -84,18 +84,70 @@
   # services.xserver.libinput.enable = true;
 
   services.emacs = {
-  	enable = true;
-	package = pkgs.emacs;
+    enable = true;
+    package = pkgs.emacs;
   };
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account.
   users.users.msantana = {
     isNormalUser = true;
     description = "Marco A. Santana";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
+      # Base Tools
+      git
+      wget
+      ripgrep
+      unzip
+      kitty
+      kitty-themes
+      ghostty # Ghostty terminal
+      ranger
+      byobu
+      sqlite
+      cmake
+      maestral
+      maestral-gui
+      logseq
+
+      # Desktop Apps
       firefox
-    #  thunderbird
+      chromium
+      google-chrome
+      vscodium
+      gitnuro
+      dbeaver
+
+      # Development Environments
+      # Node.js
+      nodejs
+      nodePackages_latest.pnpm
+      nodePackages.typescript
+      nodePackages_latest.vue-language-server
+      nodePackages_latest.vue-cli
+
+      # PHP (Updated to 8.3)
+      php83
+      php83Packages.composer
+
+      # Ruby on Rails
+      ruby_3_3
+      bundler
+      # rails is usually installed via gem, but we can add the package if needed
+      # (pkgs.rubyPackages_3_3.rails if available, otherwise just use bundler)
+
+      # Clojure
+      clojure
+      leiningen
+      babashka
+      clojure-lsp
+
+      # Python
+      python3Full
+      python311Packages.pip
+
+      # Go
+      go
     ];
   };
 
@@ -110,12 +162,12 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-   neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-   wget
-   git
+    neovim
+    wget
+    git
+    emacs # From overlay
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
