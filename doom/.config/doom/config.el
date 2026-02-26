@@ -102,3 +102,43 @@
 (after! typst-preview
   (setq typst-preview-browser "firefox") ; or "google-chrome", "chromium", etc.
   (setq typst-preview-args '("--listen" "127.0.0.1:9876")))
+
+(after! clojure-mode
+  ;; Enable paredit for powerful structural editing
+  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
+
+  ;; Keybindings for common actions
+  (map! :map clojure-mode-map
+        :localleader
+        :desc "Format buffer" "f" #'+format/buffer
+        :desc "Jack-in" "j" #'cider-jack-in
+        :desc "Connect to REPL" "c" #'cider-connect
+        :desc "Load current file" "l" #'cider-load-file
+        :desc "Run tests" "t" #'cider-test-run-ns-tests))
+
+(after! cider
+  ;; Display function signatures and documentation in the minibuffer
+  (setq cider-use-eldoc-for-symbol-completion t)
+  
+  ;; When a warning is reported, open a buffer with the details
+  (setq cider-show-error-buffer-on-warning t)
+  
+  ;; Automatically pretty-print REPL output
+  (setq cider-repl-use-pretty-printing t))
+
+(after! lsp-mode
+  ;; Optional: If you want to customize lsp-ui for a cleaner look
+  (setq lsp-ui-sideline-show-diagnostics t
+        lsp-ui-doc-show-with-mouse nil
+        lsp-ui-sideline-show-code-actions nil))
+
+;; To configure formatting, create a `.cljstyle.clj` file in your project's
+;; root directory. clojure-lsp will automatically pick it up.
+;; Example `.cljstyle.clj`:.
+;;
+;; {
+;;  :remove-consecutive-blank-lines? false
+;;  :indentation {:list-defs {\"def.*\" [[:inner 0]]}}
+;; }
+;;
+;; For more options, see the cljstyle documentation.

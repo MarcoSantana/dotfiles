@@ -8,8 +8,10 @@ function M.set_tsv_block()
   for i, letter in ipairs(letters) do
     local row = start_row + i - 1
     local line = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-    local new_line = line:gsub("^%*%a?%s?", "*" .. letter .. " ", 1)
-    vim.api.nvim_buf_set_lines(0, row, row + 1, false, { new_line })
+    if line then
+      local new_line = line:gsub("^%*%a?%s?", "*" .. letter .. " ", 1)
+      vim.api.nvim_buf_set_lines(0, row, row + 1, false, { new_line })
+    end
   end
   vim.api.nvim_win_set_cursor(0, { start_row + 4, 0 })
 end
@@ -39,7 +41,7 @@ function M.mark_all_questions()
 
   while row < total_lines - 1 do
     local line = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-    if line:match("^%*v%s") then
+    if line and line:match("^%*v%s") then
       local q_row = row + 1
       local q_line = vim.api.nvim_buf_get_lines(0, q_row, q_row + 1, false)[1]
       if q_line and q_line:match("^%*") then
@@ -184,7 +186,7 @@ function M.emma_report(is_pro)
 
   vim.cmd('vnew')
   vim.api.nvim_buf_set_lines(0, 0, -1, false, report)
-  vim.api.nvim_buf_set_option(0, 'buftype', 'nofile')
+  vim.api.nvim_set_option_value('buftype', 'nofile', { buf = 0 })
   vim.api.nvim_buf_set_name(0, is_pro and 'EMMA_PRO_Report' or 'EMMA_Report')
 end
 
@@ -194,6 +196,73 @@ function M.remove_trailing_spaces()
   vim.cmd([[%s/\s\+$//e]])
   vim.fn.setpos(".", pos)
   print("🧹 Trailing spaces removed")
+end
+
+-- Add missing capital letters
+function M.add_capital_letters()
+  local line = vim.api.nvim_get_current_line()
+
+  local new_line = line:gsub(
+    "^(%*%+?%a?%s*%d*%.?%s*)(%l)",
+    function(prefix, first_letter)
+      return prefix .. string.upper(first_letter)
+    end
+  )
+
+  vim.api.nvim_set_current_line(new_line)
+end
+
+local function capitalize_exam_line(line)
+  return line:gsub(
+    "^(%*%+?%a?%s*%d*%.?%s*)(%l)",
+    function(prefix, first_letter)
+      return prefix .. string.upper(first_letter)
+    end
+  )
+end
+
+function M.capitalize_line()
+  local line = vim.api.nvim_get_current_line()
+  local new_line = capitalize_exam_line(line)
+  vim.api.nvim_set_current_line(new_line)
+end
+
+function M.capitalize_buffer()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+  for i, line in ipairs(lines) do
+    lines[i] = capitalize_exam_line(line)
+  end
+
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+end
+
+function M.capitalize_visual()
+  local start_pos = vim.fn.getpos("'<")
+  local end_pos = vim.fn.getpos("'>")
+  local lines = vim.api.nvim_buf_get_lines(0, start_pos[2] - 1, end_pos[2], false)
+
+  for i, line in ipairs(lines) do
+    lines[i] = capitalize_exam_line(line)
+  end
+
+  vim.api.nvim_buf_set_lines(0, start_pos[2] - 1, end_pos[2], false, lines)
+end
+
+function M.capitalize_interactive()
+  -- Using Vim's :s with confirmation for a native interactive experience
+  -- Pattern matches typical exam line structure: *q 1. Lowercase -> *q 1. Uppercase
+  local pattern = [[\v^(\*\+?[atvsq]?\s*%(\d+\.?)?\s*)(\l)]]
+  local replacement = [[\1\u\2]]
+  local cmd = string.format([[%%s/%s/%s/gc]], pattern, replacement)
+  
+  -- Use pcall to handle cases where the user cancels the substitution
+  local ok, err = pcall(vim.cmd, cmd)
+  if not ok and err and not err:match("Keyboard interrupt") then
+    print("Error during interactive capitalization: " .. tostring(err))
+  elseif ok then
+    print("✨ Interactive capitalization complete")
+  end
 end
 
 --- Cleanup: Normalize Word/Special characters
@@ -264,8 +333,10 @@ function M.setup_exam_syntax()
     end
   end
 
-  -- Create Autocmd to apply matches
+  -- Create Autocmd to apply matches with a proper augroup
+  local group = vim.api.nvim_create_augroup("ExamSyntax", { clear = true })
   vim.api.nvim_create_autocmd({ "FileType", "BufWinEnter" }, {
+    group = group,
     pattern = { "markdown", "text" },
     callback = apply_matches,
   })
@@ -282,35 +353,84 @@ local function map(mode, lhs, rhs, desc)
   vim.keymap.set(mode, lhs, rhs, { desc = desc, silent = true })
 end
 
--- Exam Formatting (<leader>i)
-map('n', '<Leader>is', M.set_tsv_block, "Exam: Set TSV block")
-map('n', '<Leader>iq', M.mark_question, "Exam: Mark current question")
-map('n', '<Leader>iQ', M.mark_all_questions, "Exam: Mark all questions")
-map('n', '<Leader>ib', M.mark_study_block, "Exam: Mark study block")
 
--- Exam Tools (<leader>m, <leader>r)
-map('n', '<Leader>mc', M.check_exam, "Exam: Check structure (Quickfix)")
-map('n', '<Leader>rr', function() M.emma_report(false) end, "Report: EMMA Basic")
-map('n', '<Leader>rR', function() M.emma_report(true) end, "Report: EMMA Pro")
 
--- General Suite (<leader>T)
-map('n', '<Leader>Td', M.clean_extra_lines, "Suite: Clean extra lines")
-map('n', '<Leader>Tn', M.normalize_chars, "Suite: Normalize characters")
-map('n', '<Leader>Ts', M.remove_trailing_spaces, "Suite: Remove trailing spaces")
-map('n', '<Leader>Tr', function() M.emma_report(true) end, "Suite: EMMA Pro Report")
-map('n', '<Leader>Tl', M.locate_position, "Suite: Locate clinical position")
+-- =========================
+-- CUSTOM TOOLS (<leader>m)
+-- =========================
 
--- Emacs-style Insert Mode
-map('i', '<C-b>', '<Left>', "Move back")
-map('i', '<C-f>', '<Right>', "Move forward")
-map('i', '<C-a>', '<Home>', "Move to BOL")
-map('i', '<C-e>', '<End>', "Move to EOL")
-map('i', '<C-p>', '<Up>', "Move up")
-map('i', '<C-n>', '<Down>', "Move down")
-map('i', '<C-d>', '<Delete>', "Delete forward")
-map('i', '<C-k>', '<C-o>D', "Delete to EOL")
-map('i', '<M-f>', '<S-Right>', "Move forward word")
-map('i', '<M-b>', '<S-Left>', "Move back word")
-map('i', '<M-d>', '<C-o>dw', "Delete forward word")
+-- EXAM EDITING (<leader>me)
+map('n', '<Leader>met', M.set_tsv_block, "TSV block")
+map('n', '<Leader>meq', M.mark_question, "Mark current question")
+map('n', '<Leader>meQ', M.mark_all_questions, "Mark all questions")
+map('n', '<Leader>meb', M.mark_study_block, "Mark study block")
+
+-- CAPITALIZATION (<leader>mc)
+map('n', '<Leader>mcl', M.capitalize_line, "Capitalize line")
+map('n', '<Leader>mcb', M.capitalize_buffer, "Capitalize buffer")
+map('v', '<Leader>mcs', M.capitalize_visual, "Capitalize selection")
+map('n', '<Leader>mci', M.capitalize_interactive, "Capitalize interactive")
+
+-- REPORTS (<leader>mr)
+map('n', '<Leader>mrb', function() M.emma_report(false) end, "EMMA Basic report")
+map('n', '<Leader>mrp', function() M.emma_report(true) end, "EMMA Pro report")
+
+-- VALIDATION (<leader>mv)
+map('n', '<Leader>mvc', M.check_exam, "Check structure")
+
+-- LOCATE (<leader>ml)
+map('n', '<Leader>ml', M.locate_position, "Locate clinical position")
+
+-- UTILITIES (<leader>mx)
+map('n', '<Leader>mxc', M.clean_extra_lines, "Clean extra lines")
+map('n', '<Leader>mxn', M.normalize_chars, "Normalize characters")
+map('n', '<Leader>mxs', M.remove_trailing_spaces, "Trim trailing spaces")
+
+-- =========================
+-- INSERT (Emacs-style)
+-- =========================
+map('i', '<C-b>', '<Left>',  "← char")
+map('i', '<C-f>', '<Right>', "→ char")
+map('i', '<C-a>', '<Home>',  "BOL")
+map('i', '<C-e>', '<End>',   "EOL")
+map('i', '<C-p>', '<Up>',    "↑ line")
+map('i', '<C-n>', '<Down>',  "↓ line")
+map('i', '<C-d>', '<Delete>', "Del char")
+map('i', '<C-k>', '<C-o>D',  "Kill to EOL")
+map('i', '<M-f>', '<S-Right>', "→ word")
+map('i', '<M-b>', '<S-Left>',  "← word")
+map('i', '<M-d>', '<C-o>dw',   "Kill word")
+
+-- -- Exam Formatting (<leader>i)
+-- map('n', '<Leader>is', M.set_tsv_block, "Exam: Set TSV block")
+-- map('n', '<Leader>iq', M.mark_question, "Exam: Mark current question")
+-- map('n', '<Leader>iQ', M.mark_all_questions, "Exam: Mark all questions")
+-- map('n', '<Leader>ib', M.mark_study_block, "Exam: Mark study block")
+--
+-- -- Exam Tools (<leader>m, <leader>r)
+-- map('n', '<Leader>mc', M.check_exam, "Exam: Check structure (Quickfix)")
+-- map('n', '<Leader>rr', function() M.emma_report(false) end, "Report: EMMA Basic")
+-- map('n', '<Leader>rR', function() M.emma_report(true) end, "Report: EMMA Pro")
+--
+-- -- General Suite (<leader>T)
+-- map('n', '<Leader>Td', M.clean_extra_lines, "Suite: Clean extra lines")
+-- map('n', '<Leader>Tn', M.normalize_chars, "Suite: Normalize characters")
+-- map('n', '<Leader>Ts', M.remove_trailing_spaces, "Suite: Remove trailing spaces")
+-- map('n', '<Leader>Tr', function() M.emma_report(true) end, "Suite: EMMA Pro Report")
+-- map('n', '<Leader>Tl', M.locate_position, "Suite: Locate clinical position")
+--
+-- -- Emacs-style Insert Mode
+-- map('i', '<C-b>', '<Left>', "Move back")
+-- map('i', '<C-f>', '<Right>', "Move forward")
+-- map('i', '<C-a>', '<Home>', "Move to BOL")
+-- map('i', '<C-e>', '<End>', "Move to EOL")
+-- map('i', '<C-p>', '<Up>', "Move up")
+-- map('i', '<C-n>', '<Down>', "Move down")
+-- map('i', '<C-d>', '<Delete>', "Delete forward")
+-- map('i', '<C-k>', '<C-o>D', "Delete to EOL")
+-- map('i', '<M-f>', '<S-Right>', "Move forward word")
+-- map('i', '<M-b>', '<S-Left>', "Move back word")
+-- map('i', '<M-d>', '<C-o>dw', "Delete forward word")
+--
 
 return M
