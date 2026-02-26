@@ -9,7 +9,6 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      <home-manager/nixos>
     ];
 
     nix = {
@@ -19,13 +18,7 @@
         '';
     };
   # nixpkgs.overlays = [ (import self.inputs.emacs-overlay) ];
-  nixpkgs.overlays = [
-    (import (builtins.fetchGit {
-      url = "https://github.com/nix-community/emacs-overlay.git";
-      ref = "master";
-      rev = "bfc8f6edcb7bcf3cf24e4a7199b3f6fed96aaecf"; # change the revision
-    }))
-  ];
+  # Overlays are now handled in flake.nix
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/vda";
@@ -167,12 +160,7 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # Home Manager Configuration
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.msantana = import ../home-manager/home.nix;
-  };
+  # Home Manager Configuration is now handled in flake.nix (handled as a module)
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
