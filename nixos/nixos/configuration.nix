@@ -152,6 +152,11 @@
 
       # Modern Nix Tools
       nh
+
+      # System TUI Tools
+      bandwhich
+      gdu
+      trippy
     ];
   };
 

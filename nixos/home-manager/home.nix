@@ -42,6 +42,11 @@
     pkgs.xh
     pkgs.doggo
     pkgs.insomnia
+
+    # TUI Power Tools
+    pkgs.lazygit
+    pkgs.lazydocker
+    pkgs.bottom
   ];
 
   programs.home-manager.enable = true;
