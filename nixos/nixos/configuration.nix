@@ -146,6 +146,9 @@
 
       # Go
       go
+
+      # Modern Nix Tools
+      nh
     ];
   };
 
@@ -190,6 +193,14 @@
     dataDir = "/home/msantana";
     configDir = "/home/msantana/.config/syncthing";
   };
+
+  # Enable Tailscale
+  services.tailscale.enable = true;
+
+  # Fonts
+  fonts.packages = with pkgs; [
+    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" ]; })
+  ];
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

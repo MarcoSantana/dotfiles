@@ -34,8 +34,27 @@
     (pkgs.writeShellScriptBin "my-hello" ''
       echo "Hello, ${config.home.username}!"
     '')
+
+    # Productivity tools
+    pkgs.btop
+    pkgs.espanso
+    pkgs.du-dust
   ];
+
   programs.home-manager.enable = true;
+
+  # Modern CLI tools
+  programs.zoxide.enable = true;
+  programs.fzf.enable = true;
+  programs.eza.enable = true;
+  programs.bat.enable = true;
+  programs.starship.enable = true;
+
+  # Developer tools
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
 
   programs.emacs = {                              
 	  enable = true;
@@ -50,6 +69,24 @@
 	  enable = true;
 	  defaultCacheTtl = 1800;
 	  enableSshSupport = true;
+  };
+
+  # Aesthetics for EXWM
+  services.picom = {
+    enable = true;
+    fade = true;
+    shadow = true;
+    opacityRules = [
+      "90:class_g = 'Emacs'"
+      "95:class_g = 'Ghostty'"
+      "95:class_g = 'kitty'"
+    ];
+    settings = {
+      blur = {
+        method = "dual_kawase";
+        strength = 5;
+      };
+    };
   };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
