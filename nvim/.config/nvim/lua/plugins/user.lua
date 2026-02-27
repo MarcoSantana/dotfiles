@@ -24,17 +24,11 @@ return {
       dashboard = {
         preset = {
           header = table.concat({
-            " █████  ███████ ████████ ██████   ██████ ",
-            "██   ██ ██         ██    ██   ██ ██    ██",
-            "███████ ███████    ██    ██████  ██    ██",
-            "██   ██      ██    ██    ██   ██ ██    ██",
-            "██   ██ ███████    ██    ██   ██  ██████ ",
-            "",
-            "███    ██ ██    ██ ██ ███    ███",
-            "████   ██ ██    ██ ██ ████  ████",
-            "██ ██  ██ ██    ██ ██ ██ ████ ██",
-            "██  ██ ██  ██  ██  ██ ██  ██  ██",
-            "██   ████   ████   ██ ██      ██",
+            "                                                        ",
+            "                                                        ",
+            "               ꧁𝕵𝖊𝖘𝖚𝖘 𝖎𝖘 𝕷𝖔𝖗𝖉꧂                         ",
+            "             ♱ ХРИСТОС ВОСКРЕСЕ! ♱                      ",
+            "                                                        ",
           }, "\n"),
         },
       },
@@ -82,6 +76,23 @@ return {
         -- disable for .vim files, but it work for another filetypes
         Rule("a", "a", "-vim")
       )
+    end,
+  },
+
+  -- Smooth animations
+  {
+    "echasnovski/mini.animate",
+    event = "VeryLazy",
+    opts = function()
+      local animate = require "mini.animate"
+      return {
+        cursor = {
+          enable = false, -- Disable cursor animation to avoid conflict with Neovide's built-in animation
+        },
+        scroll = {
+          timing = animate.gen_timing.linear { duration = 150, unit = "total" },
+        },
+      }
     end,
   },
 }
