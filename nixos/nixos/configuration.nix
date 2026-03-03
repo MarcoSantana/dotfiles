@@ -41,13 +41,13 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
+  # Enable GNOME Desktop Environment.
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
   # Enable EXWM
   services.xserver.windowManager.exwm.enable = true;
-  services.xserver.displayManager.defaultSession = "nixos-exwm";
+  services.xserver.displayManager.defaultSession = "none+exwm";
 
   # Enable Hyprland
   programs.hyprland = {
@@ -56,9 +56,9 @@
   };
 
   # Configure keymap in X11
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "us";
-    xkbVariant = "";
+    variant = "";
   };
 
   # Enable CUPS to print documents.
@@ -93,7 +93,6 @@
   users.users.msantana = {
     isNormalUser = true;
     description = "Marco A. Santana";
-    extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       # Base Tools
       git
@@ -120,7 +119,7 @@
       microsoft-edge
       vscodium
       gitnuro
-      dbeaver
+      dbeaver-bin
       ngrok
 
       # Development Environments
@@ -129,7 +128,6 @@
       nodePackages_latest.pnpm
       nodePackages.typescript
       nodePackages_latest.vue-language-server
-      nodePackages_latest.vue-cli
 
       # PHP (Updated to 8.3)
       php83
@@ -168,8 +166,8 @@
   };
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "msantana";
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "msantana";
 
   # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
@@ -177,6 +175,9 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-27.3.11"
+  ];
 
   # Home Manager Configuration is now handled in flake.nix (handled as a module)
 
@@ -218,8 +219,7 @@
 
   # Fonts
   fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.fira-code
+    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" ]; })
   ];
 
   # Open ports in the firewall.
