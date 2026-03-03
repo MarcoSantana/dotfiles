@@ -8,7 +8,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     emacs-overlay.url = "github:nix-community/emacs-overlay";
-    antigravity.url = "github:googlers/antigravity-nix";
   };
 
   outputs = { self, nixpkgs, home-manager, emacs-overlay, ... }@inputs:
@@ -29,7 +28,7 @@
             home-manager.extraSpecialArgs = { inherit inputs; };
           }
           ({ pkgs, ... }: {
-            nixpkgs.overlays = [ emacs-overlay.overlay ];
+            nixpkgs.overlays = [ emacs-overlay.overlays.default ];
           })
         ];
       };

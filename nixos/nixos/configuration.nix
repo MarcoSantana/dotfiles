@@ -12,10 +12,8 @@
     ];
 
     nix = {
-        package = pkgs.nixFlakes;
-        extraOptions = ''
-          experimental-features = nix-command flakes
-        '';
+        package = pkgs.nix;
+        settings.experimental-features = [ "nix-command" "flakes" ];
     };
   # nixpkgs.overlays = [ (import self.inputs.emacs-overlay) ];
   # Overlays are now handled in flake.nix
@@ -51,6 +49,12 @@
   services.xserver.windowManager.exwm.enable = true;
   services.xserver.displayManager.defaultSession = "nixos-exwm";
 
+  # Enable Hyprland
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
+
   # Configure keymap in X11
   services.xserver = {
     layout = "us";
@@ -61,7 +65,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
+  # sound.enable = true; # Deprecated in favor of services.pipewire
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -152,7 +156,6 @@
 
       # Advanced IDEs
       lapce
-      inputs.antigravity.packages.${pkgs.system}.default
 
       # Modern Nix Tools
       nh
@@ -215,7 +218,8 @@
 
   # Fonts
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" ]; })
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.fira-code
   ];
 
   # Open ports in the firewall.
