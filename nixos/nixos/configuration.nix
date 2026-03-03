@@ -42,8 +42,8 @@
   services.xserver.enable = true;
 
   # Enable GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # Enable EXWM
   services.xserver.windowManager.exwm.enable = true;
@@ -66,7 +66,7 @@
 
   # Enable sound with pipewire.
   # sound.enable = true; # Deprecated in favor of services.pipewire
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -127,7 +127,7 @@
       nodejs
       nodePackages_latest.pnpm
       nodePackages.typescript
-      nodePackages_latest.vue-language-server
+      vue-language-server
 
       # PHP (Updated to 8.3)
       php83
@@ -146,7 +146,7 @@
       clojure-lsp
 
       # Python
-      python3Full
+      python3
       python311Packages.pip
 
       # Go
@@ -219,7 +219,8 @@
 
   # Fonts
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" ]; })
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.fira-code
   ];
 
   # Open ports in the firewall.

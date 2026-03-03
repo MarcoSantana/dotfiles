@@ -38,7 +38,7 @@
     # Productivity tools
     pkgs.btop
     pkgs.espanso
-    pkgs.du-dust
+    pkgs.dust
     pkgs.xh
     pkgs.doggo
     pkgs.insomnia
@@ -50,7 +50,7 @@
 
     # Wayland Essentials
     pkgs.waybar
-    pkgs.rofi-wayland
+    pkgs.rofi
     pkgs.hyprpaper
     pkgs.swaynotificationcenter
     pkgs.grim
@@ -258,7 +258,7 @@
       top = "btop";
       diff = "delta";
     };
-    initExtra = ''
+    initContent = ''
       # Preserve existing .zshrc logic
       source ~/dotfiles/zsh/.zshrc
     '';
