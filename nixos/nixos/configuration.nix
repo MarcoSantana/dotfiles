@@ -47,7 +47,7 @@
 
   # Enable EXWM
   services.xserver.windowManager.exwm.enable = true;
-  services.xserver.displayManager.defaultSession = "none+exwm";
+  services.displayManager.defaultSession = "none+exwm";
 
   # Enable Hyprland
   programs.hyprland = {
