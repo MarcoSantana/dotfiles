@@ -57,6 +57,32 @@
   boot.initrd.kernelModules = [ "wl" ];
   boot.blacklistedKernelModules = [ "b43" "ssb" "bcma" ];
 
+  # Intelligent Fan Control for MacBook
+  services.mbpfan.enable = true;
+
+  # Power Management and Heat Control
+  services.tlp.enable = true;
+  services.thermald.enable = true;
+
+  # Backlight control
+  programs.light.enable = true;
+
+  # Better Trackpad Experience
+  services.libinput = {
+    enable = true;
+    touchpad = {
+      tapping = true;
+      naturalScrolling = true;
+      clickMethod = "clickfinger";
+    };
+  };
+
+  # Graphics Acceleration
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+
   # --- User Configuration ---
 
   users.users.dCampuzano = {

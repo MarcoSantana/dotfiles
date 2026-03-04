@@ -9,9 +9,10 @@
     };
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zen-browser.url = "github:youwen5/zen-browser-flake";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, emacs-overlay, zen-browser, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, emacs-overlay, zen-browser, nixos-hardware, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -38,12 +39,29 @@
         inherit system;
         specialArgs = { inherit inputs; };
         modules = [
+          nixos-hardware.nixosModules.apple-macbook-pro-11-5 # Baseline for older MBPs
           ./nixos/macbook/configuration.nix
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.dCampuzano = import ./nixos/macbook/home.nix;
+            home-manager.extraSpecialArgs = { inherit inputs; };
+          }
+        ];
+      };
+
+      nixosConfigurations.lenovoL13 = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [
+          nixos-hardware.nixosModules.lenovo-thinkpad-l13
+          ./nixos/lenovoL13/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.msantana = import ./nixos/home-manager/home.nix;
             home-manager.extraSpecialArgs = { inherit inputs; };
           }
         ];
