@@ -110,11 +110,6 @@
       syncthing
 
       # Desktop Apps
-      firefox
-      chromium
-      google-chrome
-      brave
-      microsoft-edge
       vscodium
       gitnuro
       dbeaver-bin
