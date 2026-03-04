@@ -125,10 +125,12 @@
           ignore_opacity = true;
           xray = true;
         };
-        drop_shadow = "yes";
-        shadow_range = 15;
-        shadow_render_power = 4;
-        "col.shadow" = "rgba(1a1a1aee)";
+        shadow = {
+          enabled = true;
+          range = 15;
+          render_power = 4;
+          color = "rgba(1a1a1aee)";
+        };
         active_opacity = 0.95;
         inactive_opacity = 0.85;
       };
@@ -300,10 +302,10 @@
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
+    ".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/nvim/.config/nvim";
+    ".config/ghostty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/ghostty/.config/ghostty";
+    ".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/kitty/.config/kitty";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
-    # # the Nix store. Activating the configuration will then make '~/.screenrc' a
-    # # symlink to the Nix store copy.
-    # ".screenrc".source = dotfiles/screenrc;
 
     # # You can also set the file content immediately.
     # ".gradle/gradle.properties".text = ''

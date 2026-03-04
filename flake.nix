@@ -32,5 +32,20 @@
           })
         ];
       };
+
+      nixosConfigurations.macbook = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./nixos/macbook/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.dCampuzano = import ./nixos/macbook/home.nix;
+            home-manager.extraSpecialArgs = { inherit inputs; };
+          }
+        ];
+      };
     };
 }

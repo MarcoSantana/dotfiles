@@ -45,15 +45,13 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
 
-  # Enable EXWM
-  services.xserver.windowManager.exwm.enable = true;
-  services.displayManager.defaultSession = "none+exwm";
-
   # Enable Hyprland
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
   };
+
+  services.displayManager.defaultSession = "hyprland";
 
   # Configure keymap in X11
   services.xserver.xkb = {
