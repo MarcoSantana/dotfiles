@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -285,22 +285,22 @@
   };
 
   # Aesthetics for EXWM
-  services.picom = {
-    enable = true;
-    fade = true;
-    shadow = true;
-    opacityRules = [
-      "90:class_g = 'Emacs'"
-      "95:class_g = 'Ghostty'"
-      "95:class_g = 'kitty'"
-    ];
-    settings = {
-      blur = {
-        method = "dual_kawase";
-        strength = 5;
-      };
-    };
-  };
+  # services.picom = {
+  #   enable = true;
+  #   fade = true;
+  #   shadow = true;
+  #   opacityRules = [
+  #     "90:class_g = 'Emacs'"
+  #     "95:class_g = 'Ghostty'"
+  #     "95:class_g = 'kitty'"
+  #   ];
+  #   settings = {
+  #     blur = {
+  #       method = "dual_kawase";
+  #       strength = 5;
+  #     };
+  #   };
+  # };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
