@@ -48,6 +48,9 @@
             home-manager.users.dCampuzano = import ./nixos/macbook/home.nix;
             home-manager.extraSpecialArgs = { inherit inputs; };
           }
+          ({ pkgs, ... }: {
+            nixpkgs.overlays = [ emacs-overlay.overlays.default ];
+          })
         ];
       };
 
@@ -64,6 +67,9 @@
             home-manager.users.msantana = import ./nixos/home-manager/home.nix;
             home-manager.extraSpecialArgs = { inherit inputs; };
           }
+          ({ pkgs, ... }: {
+            nixpkgs.overlays = [ emacs-overlay.overlays.default ];
+          })
         ];
       };
     };

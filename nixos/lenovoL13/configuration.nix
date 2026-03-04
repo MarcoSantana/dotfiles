@@ -33,6 +33,7 @@
   # Laptop specific services
   services.thermald.enable = true;
   services.tlp.enable = true; # Power management
+  services.power-profiles-daemon.enable = pkgs.lib.mkForce false; # Conflicts with TLP
   services.upower.enable = true;
 
   # Enable sound with pipewire.
