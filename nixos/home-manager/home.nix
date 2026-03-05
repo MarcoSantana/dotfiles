@@ -371,6 +371,8 @@
     ".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/nvim/.config/nvim";
     ".config/ghostty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/ghostty/.config/ghostty";
     ".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/kitty/.config/kitty";
+    ".config/emacs".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/emacs/.config/emacs";
+    ".config/doom".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/doom/.config/doom";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
 
     # # You can also set the file content immediately.
@@ -394,6 +396,10 @@
     EDITOR = "emacs";
     BROWSER = "zen";
   };
+
+  home.sessionPath = [
+    "$HOME/.config/emacs/bin"
+  ];
 
   # Set default applications
   xdg.mimeApps = {
