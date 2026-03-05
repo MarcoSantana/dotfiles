@@ -90,8 +90,6 @@
         "$mod, SPACE, exec, rofi -show drun"
         "$mod, b, exec, zen"
         "$mod SHIFT, b, exec, google-chrome-stable"
-        "$mod, f, exec, thunar"
-        "$mod SHIFT, f, exec, ghostty -e ranger"
         "$mod, F, fullscreen,"
         "$mod, D, exec, eww open --toggle dashboard"
 
