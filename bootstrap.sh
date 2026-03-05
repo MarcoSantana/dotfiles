@@ -43,6 +43,26 @@ if [ "$ON_NIXOS" = false ] && [ "$DRY_RUN" = false ]; then
     exit 1
 fi
 
+# Failsafe: Detect EFI mount point
+BOOT_MOUNT=$(findmnt -n -o TARGET /boot 2>/dev/null || echo "")
+BOOT_EFI_MOUNT=$(findmnt -n -o TARGET /boot/efi 2>/dev/null || echo "")
+
+EFI_PATH=""
+if [ -n "$BOOT_EFI_MOUNT" ]; then
+    EFI_PATH="/boot/efi"
+elif [ -n "$BOOT_MOUNT" ]; then
+    # Check if /boot is actually the EFI partition (vfat)
+    if findmnt -n -o FSTYPE /boot | grep -q "vfat"; then
+        EFI_PATH="/boot"
+    fi
+fi
+
+if [ -n "$EFI_PATH" ]; then
+    log_info "Detected EFI partition at: $EFI_PATH"
+else
+    log_warn "Could not automatically detect EFI partition. Ensuring /boot/efi or /boot is mounted is recommended."
+fi
+
 # Check Disk space (require at least 5GB)
 if command -v df >/dev/null 2>&1; then
     FREE_SPACE=$(df / --output=avail -k | tail -1 | xargs)
@@ -91,6 +111,21 @@ else
     fi
 fi
 
+# Failsafe: Cross-check EFI path with configuration
+if [ -n "$EFI_PATH" ]; then
+    CONFIG_PATH="./nixos/$HOST/configuration.nix"
+    if [ -f "$CONFIG_PATH" ]; then
+        CONFIG_EFI=$(grep "efiSysMountPoint" "$CONFIG_PATH" | cut -d'"' -f2 || echo "")
+        if [ -n "$CONFIG_EFI" ] && [ "$CONFIG_EFI" != "$EFI_PATH" ]; then
+            log_err "Failsafe Triggered: Configuration expects EFI at '$CONFIG_EFI' but it's mounted at '$EFI_PATH'!"
+            log_err "Please update 'boot.loader.efi.efiSysMountPoint' in $CONFIG_PATH to match."
+            if [ "$DRY_RUN" = false ]; then
+                exit 1
+            fi
+        fi
+    fi
+fi
+
 # 5. Rebuild system using the flake
 log_info "Building system from flake for $HOST..."
 
@@ -98,7 +133,11 @@ if [ "$DRY_RUN" = true ]; then
     log_info "Running dry-run build..."
     nix build ".#nixosConfigurations.$HOST.config.system.build.toplevel" --dry-run --show-trace --verbose
 else
-    sudo nixos-rebuild switch --flake ".#$HOST"
+    # Failsafe wrap for the rebuild
+    if ! sudo nixos-rebuild switch --flake ".#$HOST"; then
+        log_err "Rebuild failed! If this was a bootloader error, check your EFI mount point and hardware-configuration.nix."
+        exit 1
+    fi
 fi
 
 log_info "Bootstrap process completed!"
