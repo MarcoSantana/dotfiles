@@ -51,6 +51,9 @@
   
   # Allow unfree for Broadcom drivers
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "broadcom-sta-6.30.223.271-59-6.12.74"
+  ];
 
   # Broadcom STA Driver
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];

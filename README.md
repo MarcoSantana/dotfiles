@@ -12,14 +12,14 @@ To install this configuration on a new machine:
     git clone https://github.com/your-username/dotfiles.git ~/dotfiles
     ```
 3.  **Run the Bootstrap**:
-    ```bash
-    cd ~/dotfiles
+```bash
+cd ~/dotfiles
     # Recommended: Run a dry run first to verify everything evaluates correctly
     ./bootstrap.sh --dry-run
     
     # If successful, perform the real bootstrap:
-    ./bootstrap.sh
-    ```
+./bootstrap.sh
+```
 
 ### Bootstrap Flags
 The `bootstrap.sh` script supports several flags for different hardware and maintenance tasks:
@@ -62,4 +62,20 @@ Nix builds can be storage-intensive.
 Always ensure your `flake.lock` is up to date if you change inputs.
 ```bash
 nix flake update
+```
+
+### 5. EFI Mount Route mismatch
+Newer NixOS versions tend to use `/boot` as the EFI mount point, while older ones used `/boot/efi`.
+- **Gotcha**: The bootstrap script will stop if it detects a mismatch between your system and the config.
+- **Fix**: Update `boot.loader.efi.efiSysMountPoint` in your host's `configuration.nix` to match the path detected by the bootstrap script.
+
+### 6. Pulling Updates with Local Changes
+If you have local edits but want to pull the latest version of these dotfiles:
+```bash
+# Save your changes temporarily
+git stash
+# Pull and re-apply your changes on top of the latest version
+git pull --rebase
+# Bring back your local edits
+git stash pop
 ```

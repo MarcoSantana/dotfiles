@@ -115,7 +115,7 @@ fi
 if [ -n "$EFI_PATH" ]; then
     CONFIG_PATH="./nixos/$HOST/configuration.nix"
     if [ -f "$CONFIG_PATH" ]; then
-        CONFIG_EFI=$(grep "efiSysMountPoint" "$CONFIG_PATH" | cut -d'"' -f2 || echo "")
+        CONFIG_EFI=$(grep -v "^\s*#" "$CONFIG_PATH" | grep "efiSysMountPoint" | cut -d'"' -f2 || echo "")
         if [ -n "$CONFIG_EFI" ] && [ "$CONFIG_EFI" != "$EFI_PATH" ]; then
             log_err "Failsafe Triggered: Configuration expects EFI at '$CONFIG_EFI' but it's mounted at '$EFI_PATH'!"
             log_err "Please update 'boot.loader.efi.efiSysMountPoint' in $CONFIG_PATH to match."
