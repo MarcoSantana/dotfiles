@@ -15,14 +15,14 @@
     libreoffice-fresh
     
     # PDF Tools
-    okular
+    pkgs.kdePackages.okular
     
     # Communications
-    whatsapp-for-linux
+    pkgs.whatsapp-electron
     
     # System Utils (User-friendly)
-    spectacle # Screenshot
-    gwenview # Image viewer
+    pkgs.kdePackages.spectacle # Screenshot
+    pkgs.kdePackages.gwenview # Image viewer
   ];
 
   # Enable Home Manager to manage itself

@@ -70,6 +70,7 @@
     xwayland.enable = true;
     settings = {
       "$mod" = "SUPER";
+      monitor = ",preferred,auto,1.25";
       exec-once = [
         "waybar"
         "swww init"
@@ -117,6 +118,9 @@
         # Special Workspace
         "$mod, S, togglespecialworkspace, magic"
         "$mod SHIFT, S, movetoworkspace, special:magic"
+
+        # Keybinds Helper
+        "$mod, F1, exec, ~/dotfiles/scripts/keybinds.sh"
       ];
       decoration = {
         rounding = 15;
@@ -176,7 +180,7 @@
         height = 30;
         modules-left = [ "hyprland/workspaces" "hyprland/window" ];
         modules-center = [ "clock" ];
-        modules-right = [ "pulseaudio" "network" "cpu" "memory" "tray" ];
+        modules-right = [ "pulseaudio" "network" "cpu" "memory" "tray" "custom/power" ];
         
         "hyprland/workspaces" = {
           disable-scroll = true;
@@ -202,6 +206,12 @@
           };
           on-click = "pavucontrol";
         };
+
+        "custom/power" = {
+          format = "";
+          on-click = "~/dotfiles/scripts/powermenu.sh";
+          tooltip = false;
+        };
       };
     };
     style = ''
@@ -226,6 +236,11 @@
       }
       #clock, #pulseaudio, #network, #cpu, #memory, #tray {
         padding: 0 10px;
+      }
+      #custom-power {
+        color: #ff5555;
+        padding-right: 15px;
+        font-size: 16px;
       }
     '';
   };

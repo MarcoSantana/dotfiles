@@ -63,6 +63,7 @@
   # Power Management and Heat Control
   services.tlp.enable = true;
   services.thermald.enable = true;
+  services.power-profiles-daemon.enable = pkgs.lib.mkForce false; # Conflicts with TLP
 
   # Backlight control
   programs.light.enable = true;
