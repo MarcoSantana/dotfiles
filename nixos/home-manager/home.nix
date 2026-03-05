@@ -91,6 +91,15 @@
         "$mod SHIFT, f, exec, ghostty -e ranger"
         "$mod, F, fullscreen,"
         "$mod, D, exec, eww open --toggle dashboard"
+
+        # Applications
+        "$mod, e, exec, emacs"
+        "$mod, g, exec, ghostty -e lazygit"
+        "$mod, p, exec, ghostty -e btop"
+        "$mod SHIFT, p, exec, grim -g \"$(slurp)\" - | wl-copy"
+        "$mod, v, exec, pavucontrol"
+        "$mod, t, exec, ghostty -e btm"
+        "$mod SHIFT, d, exec, insomnia"
         
         # Focus
         "$mod, H, movefocus, l"
