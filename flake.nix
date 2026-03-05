@@ -10,6 +10,10 @@
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zen-browser.url = "github:youwen5/zen-browser-flake";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    antigravity-nix = {
+      url = "github:jacopone/antigravity-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, emacs-overlay, zen-browser, nixos-hardware, ... }@inputs:

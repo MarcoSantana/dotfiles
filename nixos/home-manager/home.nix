@@ -65,6 +65,9 @@
     pkgs.brightnessctl
     pkgs.xfce.thunar
     pkgs.ranger
+
+    # Browser & Tools
+    inputs.antigravity-nix.packages."${pkgs.system}".google-antigravity-no-fhs
   ];
 
   wayland.windowManager.hyprland = {
