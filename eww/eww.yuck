@@ -1,0 +1,41 @@
+(defwindow keybinds_widget
+  :monitor 0
+  :geometry (geometry :x "20px"
+                     :y "50px"
+                     :width "300px"
+                     :height "400px"
+                     :anchor "top left")
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  (keybinds_box))
+
+(defwidget keybinds_box []
+  (box :class "main-box"
+       :orientation "v"
+       :space-evenly false
+    (label :class "title" :text "⌨ Keybindings")
+    (scroll :height 350
+      (box :orientation "v"
+           :space-evenly false
+           :spacing 10
+        (keybind_item :key "mod + b" :desc "Zen Browser")
+        (keybind_item :key "mod + B" :desc "Google Chrome")
+        (keybind_item :key "mod + f" :desc "Thunar (Files)")
+        (keybind_item :key "mod + F" :desc "Ranger")
+        (keybind_item :key "mod + Space" :desc "Rofi Launcher")
+        (keybind_item :key "mod + Q" :desc "Kill Active Window")
+        (keybind_item :key "mod + Return" :desc "Terminal (Ghostty)")
+        (keybind_item :key "mod + D" :desc "Toggle Dashboard")
+        (keybind_item :key "mod + F1" :desc "Keybinds Cheat Sheet")
+        (keybind_item :key "mod + H/J/K/L" :desc "Focus Window")
+        (keybind_item :key "mod + [0-9]" :desc "Switch Workspace")
+      ))))
+
+(defwidget keybind_item [key desc]
+  (box :class "item"
+       :orientation "h"
+       :space-evenly false
+    (label :class "key" :text key)
+    (label :class "desc" :text desc :hexpand true :halign "end")
+  ))

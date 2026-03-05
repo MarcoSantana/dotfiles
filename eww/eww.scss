@@ -1,0 +1,46 @@
+* {
+  all: unset;
+  font-family: "Inter", "JetBrainsMono Nerd Font";
+}
+
+.main-box {
+  background-color: rgba(40, 42, 54, 0.7);
+  border: 2px solid rgba(189, 147, 249, 0.5);
+  border-radius: 15px;
+  padding: 15px;
+  color: #f8f8f2;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #bd93f9;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(189, 147, 249, 0.3);
+  padding-bottom: 5px;
+}
+
+.item {
+  margin-bottom: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.item:hover {
+  background-color: rgba(189, 147, 249, 0.1);
+}
+
+.key {
+  font-family: "JetBrainsMono Nerd Font";
+  color: #50fa7b;
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.desc {
+  font-size: 13px;
+  opacity: 0.9;
+}

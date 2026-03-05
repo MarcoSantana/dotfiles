@@ -63,6 +63,8 @@
     pkgs.eww
     pkgs.playerctl
     pkgs.brightnessctl
+    pkgs.xfce.thunar
+    pkgs.ranger
   ];
 
   wayland.windowManager.hyprland = {
@@ -74,14 +76,19 @@
       exec-once = [
         "waybar"
         "swww init"
+        "swww img /home/msantana/dotfiles/assets/wallpapers/orthodox_abstract_1.png"
         "nm-applet --indicator"
         "swaync"
+        "eww open keybinds_widget"
       ];
       bind = [
         "$mod, Return, exec, ghostty"
         "$mod, Q, killactive,"
-        "$mod, B, exec, firefox"
         "$mod, SPACE, exec, rofi -show drun"
+        "$mod, b, exec, zen"
+        "$mod SHIFT, b, exec, google-chrome-stable"
+        "$mod, f, exec, thunar"
+        "$mod SHIFT, f, exec, ghostty -e ranger"
         "$mod, F, fullscreen,"
         "$mod, D, exec, eww open --toggle dashboard"
         
@@ -180,7 +187,7 @@
         height = 30;
         modules-left = [ "hyprland/workspaces" "hyprland/window" ];
         modules-center = [ "clock" ];
-        modules-right = [ "pulseaudio" "network" "cpu" "memory" "tray" "custom/power" ];
+        modules-right = [ "pulseaudio" "network" "battery" "cpu" "memory" "tray" "custom/power" ];
         
         "hyprland/workspaces" = {
           disable-scroll = true;
@@ -205,6 +212,18 @@
             "default" = [ "" "" ];
           };
           on-click = "pavucontrol";
+        };
+
+        "battery" = {
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+          format = "{capacity}% {icon}";
+          format-charging = "{capacity}% ";
+          format-plugged = "{capacity}% ";
+          format-alt = "{time} {icon}";
+          format-icons = [ "" "" "" "" "" ];
         };
 
         "custom/power" = {
@@ -241,6 +260,26 @@
         color: #ff5555;
         padding-right: 15px;
         font-size: 16px;
+      }
+      #battery {
+        color: #50fa7b;
+      }
+      #battery.warning {
+        color: #ffb86c;
+      }
+      #battery.critical:not(.charging) {
+        color: #ff5555;
+        animation-name: blink;
+        animation-duration: 0.5s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+      }
+      @keyframes blink {
+        to {
+          background-color: #ff5555;
+          color: #282a36;
+        }
       }
     '';
   };
