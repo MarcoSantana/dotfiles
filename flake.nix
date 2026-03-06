@@ -49,7 +49,8 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.dCampuzano = import ./nixos/macbook/home.nix;
+            home-manager.users.dcampuzano = import ./nixos/macbook/home.nix;
+            home-manager.users.msantana = import ./nixos/macbook/msantana.nix;
             home-manager.extraSpecialArgs = { inherit inputs; };
           }
           ({ pkgs, ... }: {

@@ -28,6 +28,9 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  # Enable GNOME desktop environment
+  services.xserver.desktopManager.gnome.enable = true;
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -89,10 +92,16 @@
 
   # --- User Configuration ---
 
-  users.users.dCampuzano = {
+  users.users.dcampuzano = {
     isNormalUser = true;
     description = "Danelia Campuzano";
     extraGroups = [ "networkmanager" "wheel" "lp" "scanner" ];
+  };
+
+  users.users.msantana = {
+    isNormalUser = true;
+    description = "Marco Santana";
+    extraGroups = [ "networkmanager" "wheel" ];
   };
 
   # --- System Packages ---

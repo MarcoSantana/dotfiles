@@ -21,7 +21,21 @@ Session\ Storage/
 Local\ Storage/
 
 # Emacs specific
+emacs/.config/emacs/
 eln-cache/
 auto-save-list/
 tramp
 dist/
+*.*~
+\#*
+.\#*
+*.elc
+*.eln
+*.fas
+*.eld
+.emacs.desktop
+.emacs.desktop.lock
+.projectile
+elpa/
+server/
+var/
