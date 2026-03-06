@@ -74,6 +74,7 @@
     pkgs.github-desktop
     pkgs.neovim
     pkgs.neovide
+    pkgs.rubyPackages_3_3.solargraph
     
     # Typst & PDF Power Tools
     pkgs.typst
