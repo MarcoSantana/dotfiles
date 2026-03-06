@@ -82,11 +82,6 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  services.emacs = {
-    enable = true;
-    package = pkgs.emacs-unstable; # From overlay
-  };
-
   # Define a user account.
   users.users.msantana = {
     isNormalUser = true;

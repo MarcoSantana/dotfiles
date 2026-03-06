@@ -149,7 +149,8 @@
         "$mod, D, exec, eww open --toggle dashboard"
 
         # Applications
-        "$mod, e, exec, emacs"
+        "$mod, e, exec, emacsclient -c -a ''"
+        "$mod CONTROL, e, exec, emacsclient -c -a ''" # Emacs Anywhere shortcut
         "$mod, g, exec, ghostty -e lazygit"
         "$mod SHIFT, g, exec, github-desktop"
         "$mod SHIFT, n, exec, neovide"
@@ -498,6 +499,11 @@
       ps = "procs";
       top = "btop";
       diff = "delta";
+      # Emacs Daemon Control
+      emacs-start = "systemctl --user start emacs.service";
+      emacs-stop = "systemctl --user stop emacs.service";
+      emacs-restart = "systemctl --user restart emacs.service";
+      e = "emacsclient -c -a ''";
     };
     initContent = ''
       # Preserve existing .zshrc logic
@@ -505,13 +511,11 @@
     '';
   };
 
-  programs.emacs = {                              
+  services.emacs = {                              
 	  enable = true;
     package = pkgs.emacs-unstable;
-	  extraPackages = epkgs: [
-		  epkgs.nix-mode
-		  epkgs.magit
-	  ];
+    client.enable = true;
+    defaultEditor = false;
   };
 
   services.gpg-agent = {                          
@@ -647,7 +651,7 @@
   #
   # if you don't want to manage your shell through Home Manager.
   home.sessionVariables = {
-    EDITOR = "nvim";
+    EDITOR = "emacsclient -c -a ''";
     BROWSER = "zen";
     # Wayland Fixes for Electron & other toolkits
     NIXOS_OZONE_WL = "1";
