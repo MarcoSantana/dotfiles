@@ -24,7 +24,7 @@
         (keybind_item :key "mod + m" :desc "Full screen")
         (keybind_item :key "mod + Shift + m" :desc "Displays (nwg)")
         (keybind_item :key "mod + SPACE" :desc "Rofi Launcher")
-        (keybind_item :key "mod + Q" :desc "Kill Active Window")
+        (keybind_item :key "mod + q" :desc "Kill Active Window")
         (keybind_item :key "mod + F1" :desc "Keybinds Helper (Eww)")
         (keybind_item :key "mod + D" :desc "Dashboard (Eww)")
         (keybind_item :key "mod + e" :desc "Emacs")

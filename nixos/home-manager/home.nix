@@ -624,7 +624,6 @@
     ".config/ghostty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/ghostty/.config/ghostty";
     ".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/kitty/.config/kitty";
     ".config/emacs".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/emacs/.config/emacs";
-    ".config/doom".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/doom/.config/doom";
     ".config/eww".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/eww";
     ".config/rofi".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/rofi";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
@@ -659,10 +658,6 @@
     CLUTTER_BACKEND = "wayland";
     WGPU_BACKEND = "vulkan";
   };
-
-  home.sessionPath = [
-    "$HOME/.config/emacs/bin"
-  ];
 
   # Set default applications
   xdg.mimeApps = {
