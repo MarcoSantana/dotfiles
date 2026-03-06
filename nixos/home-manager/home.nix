@@ -72,6 +72,7 @@
     pkgs.ranger
     pkgs.ghostty
     pkgs.github-desktop
+    pkgs.neovim
     pkgs.neovide
     
     # Typst & PDF Power Tools
@@ -121,6 +122,9 @@
     settings = {
       "$mod" = "SUPER";
       monitor = ",preferred,auto,1.25";
+      xwayland = {
+        force_zero_scaling = true;
+      };
       input = {
         kb_options = "ctrl:nocaps";
       };
@@ -644,6 +648,15 @@
   home.sessionVariables = {
     EDITOR = "nvim";
     BROWSER = "zen";
+    # Wayland Fixes for Electron & other toolkits
+    NIXOS_OZONE_WL = "1";
+    ELECTRON_OZONE_PLATFORM_HINT = "auto";
+    MOZ_ENABLE_WAYLAND = "1";
+    GDK_BACKEND = "wayland,x11";
+    QT_QPA_PLATFORM = "wayland;xcb";
+    SDL_VIDEODRIVER = "wayland";
+    CLUTTER_BACKEND = "wayland";
+    WGPU_BACKEND = "vulkan";
   };
 
   home.sessionPath = [

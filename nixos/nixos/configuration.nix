@@ -176,7 +176,6 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    neovim
     wget
     git
     emacs-unstable # From overlay

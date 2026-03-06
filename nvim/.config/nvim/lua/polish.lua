@@ -2,10 +2,10 @@ require "utils"
 
 if vim.g.neovide then
   -- Font settings
-  vim.opt.guifont = "FiraCode Nerd Font,CaskaydiaCove Nerd Font,AnonymicePro Nerd Font:h12"
+  vim.opt.guifont = "JetBrainsMono Nerd Font Mono:h12"
 
   -- Aesthetics
-  vim.g.neovide_transparency = 0.85
+  vim.g.neovide_opacity = 0.85
   vim.g.neovide_window_blurred = true
   vim.g.neovide_floating_blur_amount_x = 2.0
   vim.g.neovide_floating_blur_amount_y = 2.0
