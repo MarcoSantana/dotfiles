@@ -62,6 +62,22 @@ return {
           end,
         },
       },
+      typst_compile = {
+        {
+          event = "BufWritePost",
+          pattern = "*.typ",
+          callback = function()
+            local file = vim.fn.expand "%"
+            vim.fn.jobstart({ "typst", "compile", file }, {
+              on_exit = function(_, code)
+                if code ~= 0 then
+                  vim.notify("Typst: Auto-compilation failed", vim.log.levels.ERROR)
+                end
+              end,
+            })
+          end,
+        },
+      },
     },
     -- Mappings can be configured through AstroCore as well.
     -- NOTE: keycodes follow the casing in the vimdocs. For example, `<Leader>` must be capitalized
@@ -73,6 +89,25 @@ return {
         -- navigate buffer tabs
         ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
         ["[b"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
+
+        -- Typst Preview (Zathura fallback)
+        ["<Leader>tp"] = {
+          function()
+            local file = vim.fn.expand "%"
+            local pdf = vim.fn.expand("%:r") .. ".pdf"
+            vim.fn.jobstart({ "typst", "compile", file }, {
+              on_exit = function(_, code)
+                if code == 0 then
+                  vim.fn.jobstart({ "zathura", pdf })
+                  vim.notify("Typst: PDF generated and opened in Zathura", vim.log.levels.INFO)
+                else
+                  vim.notify("Typst: Compilation failed", vim.log.levels.ERROR)
+                end
+              end,
+            })
+          end,
+          desc = "Typst: Preview PDF (Zathura)",
+        },
 
         -- mappings seen under group name "Buffer"
         ["<Leader>bd"] = {

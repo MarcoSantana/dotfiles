@@ -103,7 +103,7 @@ return {
     version = "1.*",
     build = function() require("typst-preview").update() end,
     opts = {
-      open_cmd = "zen %s", -- Use your Zen browser for preview
+      open_cmd = "xdg-open %s", -- Better compatibility for browser preview
     },
   },
 
