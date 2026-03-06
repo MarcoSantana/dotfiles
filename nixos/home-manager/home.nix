@@ -6,6 +6,7 @@
     ./hypridle.nix
     ./modules/emacs.nix
     ./modules/hyprland.nix
+    ./modules/nvim.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
@@ -74,8 +75,6 @@
     pkgs.ranger
     pkgs.ghostty
     pkgs.github-desktop
-    pkgs.neovim
-    pkgs.neovide
     pkgs.rubyPackages_3_3.solargraph
     
     # Typst & PDF Power Tools
@@ -452,7 +451,6 @@
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
-    ".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/nvim/.config/nvim";
     ".config/ghostty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/ghostty/.config/ghostty";
     ".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/kitty/.config/kitty";
     ".config/eww".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/eww";
