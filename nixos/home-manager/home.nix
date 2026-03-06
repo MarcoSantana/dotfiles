@@ -194,6 +194,10 @@
           format-icons = [ "" "" "" "" "" ];
         };
 
+        "tray" = {
+          spacing = 10;
+        };
+
         "custom/power" = {
           format = "";
           on-click = "~/dotfiles/scripts/powermenu.sh";
@@ -223,6 +227,14 @@
       }
       #clock, #pulseaudio, #network, #cpu, #memory, #disk, #tray {
         padding: 0 10px;
+      }
+      #tray {
+        padding-right: 8px;
+      }
+      #tray > .passive,
+      #tray > .active,
+      #tray > .needs-attention {
+        padding: 0 4px;
       }
       #cpu.warning, #disk.warning {
         color: #ffb86c;
