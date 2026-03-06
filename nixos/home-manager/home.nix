@@ -72,6 +72,7 @@
     pkgs.ranger
     pkgs.ghostty
     pkgs.github-desktop
+    pkgs.neovide
     
     # Locking & Idle
     pkgs.hyprlock
@@ -118,6 +119,7 @@
         "$mod, e, exec, emacs"
         "$mod, g, exec, ghostty -e lazygit"
         "$mod SHIFT, g, exec, github-desktop"
+        "$mod SHIFT, n, exec, neovide"
         "$mod, p, exec, ghostty -e btop"
         "$mod SHIFT, p, exec, grim -g \"$(slurp)\" - | wl-copy"
         "$mod, v, exec, pavucontrol"
