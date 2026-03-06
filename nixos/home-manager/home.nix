@@ -469,7 +469,7 @@
     };
     extraConfig = {
       color.ui = true;
-      core.editor = "emacs";
+      core.editor = "nvim";
       push.autoSetupRemote = true;
       pull.rebase = true;
       init.defaultBranch = "main";
@@ -480,7 +480,7 @@
     enable = true;
     settings = {
       git_protocol = "ssh";
-      editor = "emacs";
+      editor = "nvim";
       prompt = "enabled";
       aliases = {
         co = "pr checkout";
@@ -546,7 +546,7 @@
   #
   # if you don't want to manage your shell through Home Manager.
   home.sessionVariables = {
-    EDITOR = "emacs";
+    EDITOR = "nvim";
     BROWSER = "zen";
   };
 
