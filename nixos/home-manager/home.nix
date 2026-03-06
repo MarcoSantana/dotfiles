@@ -537,7 +537,7 @@
       Type = "simple";
       ExecStartPre = "/run/current-system/sw/bin/mkdir -p %h/GoogleDrive";
       ExecStart = ''
-        ${pkgs.rclone}/bin/rclone mount google-drive: %h/GoogleDrive \
+        ${pkgs.rclone}/bin/rclone mount marco.santana: %h/GoogleDrive \
           --vfs-cache-mode full \
           --vfs-cache-max-age 24h \
           --vfs-cache-max-size 10G \
