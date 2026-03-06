@@ -90,6 +90,9 @@
     settings = {
       "$mod" = "SUPER";
       monitor = ",preferred,auto,1.25";
+      input = {
+        kb_options = "ctrl:nocaps";
+      };
       exec-once = [
         "waybar"
         "swww init"
@@ -433,6 +436,13 @@
 
   # Make fonts available to the user environment
   fonts.fontconfig.enable = true;
+
+  # GNOME Desktop configurations via dconf
+  dconf.settings = {
+    "org/gnome/desktop/input-sources" = {
+      xkb-options = [ "ctrl:nocaps" ];
+    };
+  };
 
   # Let Home Manager install and manage itself.
   # programs.home-manager.enable = true;
