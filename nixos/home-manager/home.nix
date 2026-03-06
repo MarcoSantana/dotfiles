@@ -78,10 +78,12 @@
     # Wallpaper & Display Management
     pkgs.waypaper
     pkgs.nwg-displays
+    pkgs.hyprmon
     pkgs.wlr-randr # Required by nwg-displays for wlroots/hyprland
 
     # Browser & Tools
     inputs.antigravity-nix.packages."${pkgs.system}".google-antigravity-no-fhs
+    inputs.wifitui.packages."${pkgs.system}".default
   ];
 
   wayland.windowManager.hyprland = {
@@ -128,6 +130,10 @@
         "$mod, K, movefocus, u"
         "$mod, J, movefocus, d"
 
+        # Cycle Windows (a la Alt+Tab)
+        "$mod, Tab, cyclenext,"
+        "$mod SHIFT, Tab, cyclenext, prev"
+
         # Workspaces
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
@@ -158,6 +164,31 @@
 
         # Keybinds Helper
         "$mod, F1, exec, ~/dotfiles/scripts/keybinds.sh"
+      ];
+      bindel = [
+        # Volume Control
+        ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
+        ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+        
+        # Brightness Control
+        ", XF86MonBrightnessUp, exec, brightnessctl set +5%"
+        ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+      ];
+      bindl = [
+        # Media Control
+        ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+        ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+        ", XF86AudioPlay, exec, playerctl play-pause"
+        ", XF86AudioPause, exec, playerctl play-pause"
+        ", XF86AudioNext, exec, playerctl next"
+        ", XF86AudioPrev, exec, playerctl previous"
+
+        # System Control
+        ", XF86Display, exec, nwg-displays"
+        ", XF86WLAN, exec, nmcli radio wifi toggle"
+        ", XF86Search, exec, rofi -show drun"
+        ", XF86KbdBrightnessUp, exec, brightnessctl -d *kbd_backlight* set +1"
+        ", XF86KbdBrightnessDown, exec, brightnessctl -d *kbd_backlight* set 1-"
       ];
       decoration = {
         rounding = 15;
@@ -365,7 +396,16 @@
   services.gpg-agent = {                          
 	  enable = true;
 	  defaultCacheTtl = 1800;
-	  enableSshSupport = true;
+	  enableSshSupport = false;
+  };
+
+  services.ssh-agent.enable = true;
+
+  programs.ssh = {
+    enable = true;
+    matchBlocks."*" = {
+      addKeysToAgent = "yes";
+    };
   };
 
   # Aesthetics for EXWM
@@ -395,6 +435,7 @@
     ".config/emacs".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/emacs/.config/emacs";
     ".config/doom".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/doom/.config/doom";
     ".config/eww".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/eww";
+    ".config/rofi".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/rofi";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
 
     # # You can also set the file content immediately.

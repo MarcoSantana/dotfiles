@@ -14,9 +14,13 @@
       url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    wifitui = {
+      url = "github:shazow/wifitui";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, emacs-overlay, zen-browser, nixos-hardware, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, emacs-overlay, zen-browser, nixos-hardware, wifitui, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
