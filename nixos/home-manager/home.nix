@@ -1,6 +1,11 @@
 { config, pkgs, inputs, ... }:
 
 {
+  imports = [
+    ./hyprlock.nix
+    ./hypridle.nix
+  ];
+
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "msantana";
@@ -29,7 +34,7 @@
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
     # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
+    pkgs.nerd-fonts.jetbrains-mono
 
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your
@@ -65,6 +70,15 @@
     pkgs.brightnessctl
     pkgs.xfce.thunar
     pkgs.ranger
+    
+    # Locking & Idle
+    pkgs.hyprlock
+    pkgs.hypridle
+    
+    # Wallpaper & Display Management
+    pkgs.waypaper
+    pkgs.nwg-displays
+    pkgs.wlr-randr # Required by nwg-displays for wlroots/hyprland
 
     # Browser & Tools
     inputs.antigravity-nix.packages."${pkgs.system}".google-antigravity-no-fhs
@@ -101,6 +115,9 @@
         "$mod, v, exec, pavucontrol"
         "$mod, t, exec, ghostty -e btm"
         "$mod SHIFT, d, exec, insomnia"
+        "$mod SHIFT, L, exec, loginctl lock-session"
+        "$mod, W, exec, waypaper"
+        "$mod, M, exec, nwg-displays"
         
         # Focus
         "$mod, H, movefocus, l"
@@ -413,6 +430,9 @@
       "x-scheme-handler/unknown" = "zen.desktop";
     };
   };
+
+  # Make fonts available to the user environment
+  fonts.fontconfig.enable = true;
 
   # Let Home Manager install and manage itself.
   # programs.home-manager.enable = true;
