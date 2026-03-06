@@ -98,6 +98,7 @@
     pkgs.maestral-gui
     pkgs.syncthing
     pkgs.syncthingtray
+    pkgs.rclone
 
     # Locking & Idle
     pkgs.hyprlock
@@ -515,6 +516,36 @@
   };
 
   services.syncthing.enable = true;
+
+  systemd.user.services.rclone-gdrive-mount = {
+    Unit = {
+      Description = "rclone: Remote FUSE filesystem for Google Drive";
+      After = [ "network-online.target" ];
+      Wants = [ "network-online.target" ];
+    };
+    Service = {
+      Type = "simple";
+      ExecStartPre = "/run/current-system/sw/bin/mkdir -p %h/GoogleDrive";
+      ExecStart = ''
+        ${pkgs.rclone}/bin/rclone mount google-drive: %h/GoogleDrive \
+          --vfs-cache-mode full \
+          --vfs-cache-max-age 24h \
+          --vfs-cache-max-size 10G \
+          --vfs-read-chunk-size 32M \
+          --no-modtime \
+          --addr-refresh-interval 5m \
+          --vfs-proxy-logging \
+          --daemon-timeout 10m
+      '';
+      ExecStop = "/run/current-system/sw/bin/fusermount -u %h/GoogleDrive";
+      Restart = "on-failure";
+      RestartSec = "10s";
+      Environment = [ "PATH=/run/current-system/sw/bin" ];
+    };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+  };
 
   services.ssh-agent.enable = true;
 
