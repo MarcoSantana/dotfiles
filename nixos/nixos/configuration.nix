@@ -13,7 +13,15 @@
 
     nix = {
         package = pkgs.nix;
-        settings.experimental-features = [ "nix-command" "flakes" ];
+        settings = {
+          experimental-features = [ "nix-command" "flakes" ];
+          auto-optimise-store = true;
+        };
+        gc = {
+          automatic = true;
+          dates = "weekly";
+          options = "--delete-older-than 7d";
+        };
     };
   # nixpkgs.overlays = [ (import self.inputs.emacs-overlay) ];
   # Overlays are now handled in flake.nix
@@ -145,6 +153,8 @@
 
       # Modern Nix Tools
       nh
+      nix-index
+      comma
 
       # System TUI Tools
       bandwhich
