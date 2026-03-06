@@ -86,6 +86,14 @@
     pkgs.ocrmypdf
     pkgs.chafa
 
+    # Markdown Power Tools
+    pkgs.glow
+    pkgs.marksman
+    pkgs.markdownlint-cli2
+    pkgs.mermaid-cli
+    pkgs.hugo
+    pkgs.obsidian
+
     # Locking & Idle
     pkgs.hyprlock
     pkgs.hypridle
