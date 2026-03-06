@@ -74,6 +74,18 @@
     pkgs.github-desktop
     pkgs.neovide
     
+    # Typst & PDF Power Tools
+    pkgs.typst
+    pkgs.tinymist
+    pkgs.typstyle
+    pkgs.hayagriva
+    pkgs.pandoc
+    pkgs.zathura
+    pkgs.ghostscript
+    pkgs.poppler_utils
+    pkgs.ocrmypdf
+    pkgs.chafa
+
     # Locking & Idle
     pkgs.hyprlock
     pkgs.hypridle
@@ -405,6 +417,42 @@
   programs.eza.enable = true;
   programs.bat.enable = true;
   programs.starship.enable = true;
+
+  programs.zathura = {
+    enable = true;
+    options = {
+      recolor = true;
+      recolor-lightcolor = "#282a36";
+      recolor-darkcolor = "#f8f8f2";
+      default-bg = "#282a36";
+      default-fg = "#f8f8f2";
+      statusbar-bg = "#44475a";
+      statusbar-fg = "#f8f8f2";
+      inputbar-bg = "#282a36";
+      inputbar-fg = "#8be9fd";
+      notification-bg = "#282a36";
+      notification-fg = "#f1fa8c";
+      notification-error-bg = "#ff5555";
+      notification-error-fg = "#f8f8f2";
+      notification-warning-bg = "#ffb86c";
+      notification-warning-fg = "#282a36";
+      highlight-color = "#f1fa8c";
+      highlight-active-color = "#bd93f9";
+      completion-bg = "#282a36";
+      completion-fg = "#6272a4";
+      completion-highlight-bg = "#44475a";
+      completion-highlight-fg = "#f8f8f2";
+      index-bg = "#282a36";
+      index-fg = "#f8f8f2";
+      index-active-bg = "#44475a";
+      index-active-fg = "#bd93f9";
+      render-loading = true;
+      render-loading-bg = "#282a36";
+      render-loading-fg = "#f8f8f2";
+      selection-clipboard = "clipboard";
+      font = "JetBrainsMono Nerd Font 12";
+    };
+  };
 
   # Developer tools
   programs.direnv = {
