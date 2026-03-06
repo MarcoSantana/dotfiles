@@ -82,7 +82,7 @@
     pkgs.pandoc
     pkgs.zathura
     pkgs.ghostscript
-    pkgs.poppler_utils
+    pkgs.poppler-utils
     pkgs.ocrmypdf
     pkgs.chafa
 
