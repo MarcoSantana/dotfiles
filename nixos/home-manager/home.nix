@@ -70,6 +70,7 @@
     pkgs.brightnessctl
     pkgs.xfce.thunar
     pkgs.ranger
+    pkgs.ghostty
     
     # Locking & Idle
     pkgs.hyprlock
@@ -109,7 +110,7 @@
         "$mod, SPACE, exec, rofi -show drun"
         "$mod, b, exec, zen"
         "$mod SHIFT, b, exec, google-chrome-stable"
-        "$mod, F, fullscreen,"
+        "$mod, m, fullscreen,"
         "$mod, D, exec, eww open --toggle dashboard"
 
         # Applications
@@ -121,8 +122,9 @@
         "$mod, t, exec, ghostty -e btm"
         "$mod SHIFT, d, exec, insomnia"
         "$mod SHIFT, L, exec, loginctl lock-session"
-        "$mod, W, exec, waypaper"
-        "$mod, M, exec, nwg-displays"
+        "$mod, w, exec, ghostty -e wifitui"
+        "$mod SHIFT, m, exec, nwg-displays"
+        "$mod, F1, exec, eww open --toggle keybinds_widget"
         
         # Focus
         "$mod, H, movefocus, l"
@@ -248,7 +250,7 @@
         height = 30;
         modules-left = [ "hyprland/workspaces" "hyprland/window" ];
         modules-center = [ "clock" ];
-        modules-right = [ "pulseaudio" "network" "battery" "cpu" "memory" "tray" "custom/power" ];
+        modules-right = [ "disk" "cpu" "memory" "pulseaudio" "network" "battery" "tray" "custom/power" ];
         
         "hyprland/workspaces" = {
           disable-scroll = true;
@@ -259,18 +261,46 @@
           format = "{:%H:%M:%S}";
           interval = 1;
         };
+        "disk" = {
+          interval = 30;
+          format = "󰋊 {percentage_used}%";
+          path = "/";
+          states = {
+            warning = 80;
+            critical = 90;
+          };
+        };
+        "cpu" = {
+          interval = 1;
+          format = " {usage}%";
+          states = {
+            warning = 70;
+            critical = 90;
+          };
+        };
+        "memory" = {
+          format = "󰍛 {percentage}%";
+        };
+        "network" = {
+          format-wifi = " {essid} ({signalStrength}%)";
+          format-ethernet = "󰈀 {ifname}";
+          format-linked = "󰈀 {ifname} (No IP)";
+          format-disconnected = "󰖪 Disconnected";
+          tooltip-format = "{ifname} via {gwaddr} ";
+          on-click = "ghostty -e wifitui";
+        };
         "pulseaudio" = {
           format = "{volume}% {icon}";
           format-bluetooth = "{volume}% {icon}";
           format-muted = "";
           format-icons = {
-            "headphone" = "";
-            "hands-free" = "";
-            "headset" = "";
-            "phone" = "";
-            "portable" = "";
-            "car" = "";
-            "default" = [ "" "" ];
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = [ "" "" ];
           };
           on-click = "pavucontrol";
         };
@@ -314,8 +344,26 @@
         color: #bd93f9;
         border-bottom: 2px solid #bd93f9;
       }
-      #clock, #pulseaudio, #network, #cpu, #memory, #tray {
+      #clock, #pulseaudio, #network, #cpu, #memory, #disk, #tray {
         padding: 0 10px;
+      }
+      #cpu.warning, #disk.warning {
+        color: #ffb86c;
+      }
+      #cpu.critical, #disk.critical {
+        color: #ff5555;
+      }
+      #network {
+        color: #8be9fd;
+      }
+      #cpu {
+        color: #bd93f9;
+      }
+      #memory {
+        color: #ff79c6;
+      }
+      #disk {
+        color: #f1fa8c;
       }
       #custom-power {
         color: #ff5555;

@@ -2,8 +2,8 @@
   :monitor 0
   :geometry (geometry :x "20px"
                      :y "50px"
-                     :width "300px"
-                     :height "400px"
+                     :width "500px"
+                     :height "600px"
                      :anchor "top left")
   :stacking "bottom"
   :exclusive false
@@ -15,34 +15,34 @@
        :orientation "v"
        :space-evenly false
     (label :class "title" :text "⌨ Keybindings")
-    (scroll :height 350
+    (scroll :height 500
       (box :orientation "v"
            :space-evenly false
            :spacing 10
-        (keybind_item :key "mod + b" :desc "Zen Browser")
-        (keybind_item :key "mod + B" :desc "Google Chrome")
-        (keybind_item :key "mod + f" :desc "Thunar (Files)")
-        (keybind_item :key "mod + F" :desc "Ranger")
+        (keybind_item :key "mod + Return" :desc "Terminal (Ghostty)")
+        (keybind_item :key "mod + w" :desc "Wifi (wifitui)")
+        (keybind_item :key "mod + m" :desc "Full screen")
+        (keybind_item :key "mod + Shift + m" :desc "Displays (nwg)")
+        (keybind_item :key "mod + SPACE" :desc "Rofi Launcher")
+        (keybind_item :key "mod + Q" :desc "Kill Active Window")
+        (keybind_item :key "mod + F1" :desc "Keybinds Helper (Eww)")
+        (keybind_item :key "mod + D" :desc "Dashboard (Eww)")
         (keybind_item :key "mod + e" :desc "Emacs")
+        (keybind_item :key "mod + b" :desc "Zen Browser")
+        (keybind_item :key "mod + SHIFT + b" :desc "Google Chrome")
         (keybind_item :key "mod + g" :desc "Lazygit")
         (keybind_item :key "mod + p" :desc "Btop")
+        (keybind_item :key "mod + t" :desc "Bottom (Monitor)")
         (keybind_item :key "mod + Shift + p" :desc "Screenshot")
         (keybind_item :key "mod + v" :desc "Audio Control")
-        (keybind_item :key "mod + t" :desc "Bottom (Monitor)")
-        (keybind_item :key "mod + Shift + d" :desc "Insomnia")
-        (keybind_item :key "mod + Space" :desc "Rofi Launcher")
-        (keybind_item :key "mod + Q" :desc "Kill Active Window")
-        (keybind_item :key "mod + Return" :desc "Terminal (Ghostty)")
-        (keybind_item :key "mod + D" :desc "Toggle Dashboard")
-        (keybind_item :key "mod + F1" :desc "Keybinds Cheat Sheet")
-        (keybind_item :key "mod + H/J/K/L" :desc "Focus Window")
-        (keybind_item :key "mod + [0-9]" :desc "Switch Workspace")
-      ))))
+        (keybind_item :key "mod + Tab" :desc "Cycle Next Window")
+        (keybind_item :key "mod + [0-9]" :desc "Switch Workspace")))))
+      
 
 (defwidget keybind_item [key desc]
   (box :class "item"
        :orientation "h"
        :space-evenly false
     (label :class "key" :text key)
-    (label :class "desc" :text desc :hexpand true :halign "end")
-  ))
+    (label :class "desc" :text desc :hexpand true :halign "end")))
+  
