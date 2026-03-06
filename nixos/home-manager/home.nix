@@ -394,6 +394,7 @@
     ".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/kitty/.config/kitty";
     ".config/emacs".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/emacs/.config/emacs";
     ".config/doom".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/doom/.config/doom";
+    ".config/eww".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/eww";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
 
     # # You can also set the file content immediately.
