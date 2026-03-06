@@ -71,6 +71,7 @@
     pkgs.xfce.thunar
     pkgs.ranger
     pkgs.ghostty
+    pkgs.github-desktop
     
     # Locking & Idle
     pkgs.hyprlock
@@ -116,6 +117,7 @@
         # Applications
         "$mod, e, exec, emacs"
         "$mod, g, exec, ghostty -e lazygit"
+        "$mod SHIFT, g, exec, github-desktop"
         "$mod, p, exec, ghostty -e btop"
         "$mod SHIFT, p, exec, grim -g \"$(slurp)\" - | wl-copy"
         "$mod, v, exec, pavucontrol"
@@ -449,11 +451,42 @@
 
   services.ssh-agent.enable = true;
 
+  programs.git = {
+    enable = true;
+    userName = "MarcoSantana";
+    userEmail = "marco.santana@gmail.com";
+    lfs.enable = true;
+    delta = {
+      enable = true;
+      options = {
+        line-numbers = true;
+        side-by-side = true;
+        navigate = true;
+        syntax-theme = "Dracula";
+      };
+    };
+    extraConfig = {
+      color.ui = true;
+      core.editor = "emacs";
+      push.autoSetupRemote = true;
+      pull.rebase = true;
+      init.defaultBranch = "main";
+    };
+  };
+
   programs.gh = {
     enable = true;
     settings = {
       git_protocol = "ssh";
+      editor = "emacs";
+      prompt = "enabled";
+      aliases = {
+        co = "pr checkout";
+        pv = "pr view";
+        rv = "repo view";
+      };
     };
+    extensions = [ pkgs.gh-dash ];
   };
 
   programs.ssh = {
