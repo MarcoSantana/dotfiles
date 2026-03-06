@@ -19,6 +19,13 @@
       fsType = "ext4";
     };
 
+  # EFI boot partition – replace label/UUID with your actual device after running
+  # nixos-generate-config on the MacBook
+  fileSystems."/boot" =
+    { device = "/dev/disk/by-label/boot";
+      fsType = "vfat";
+    };
+
   swapDevices = [ ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
