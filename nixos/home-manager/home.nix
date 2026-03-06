@@ -624,6 +624,7 @@
     ".config/ghostty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/ghostty/.config/ghostty";
     ".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/kitty/.config/kitty";
     ".config/emacs".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/emacs/.config/emacs";
+    ".spacemacs".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/emacs/.spacemacs";
     ".config/eww".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/eww";
     ".config/rofi".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/rofi";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
