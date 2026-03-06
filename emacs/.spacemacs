@@ -34,25 +34,29 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layers
    '(
      ;; ----------------------------------------------------------------
-     ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
-     ;; `M-m f e R' (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
      ;; auto-completion
-     ;; better-defaults
+     auto-completion
+     better-defaults
      emacs-lisp
-     ;; git
+     git
+     github
      helm
-     ;; lsp
-     ;; markdown
+     lsp
+     markdown
      multiple-cursors
-     ;; org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
-     ;; spell-checking
-     ;; syntax-checking
-     ;; version-control
+     org
+     (ruby-on-rails :variables ruby-on-rails-test-command "rspec")
+     ruby
+     html
+     javascript
+     (php :variables php-backend 'lsp)
+     clojure
+     (shell :variables
+            shell-default-height 30
+            shell-default-position 'bottom)
+     spell-checking
+     syntax-checking
+     version-control
      treemacs)
 
 
@@ -64,7 +68,7 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(typst-ts-mode)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -230,8 +234,8 @@ It should only modify the values of Spacemacs settings."
    ;; fixed-pitch faces. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 10.0
+   dotspacemacs-default-font '("JetBrainsMono Nerd Font Mono"
+                               :size 13.0
                                :weight normal
                                :width normal)
 
@@ -573,6 +577,18 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  (use-package typst-ts-mode
+    :ensure t
+    :defer t
+    :mode ("\\.typ\\'" . typst-ts-mode)
+    :config
+    (with-eval-after-load 'lsp-mode
+      (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst"))
+      (lsp-register-client
+       (make-lsp-client
+        :new-connection (lsp-stdio-connection "tinymist")
+        :major-modes '(typst-ts-mode)
+        :server-id 'tinymist))))
   )
 
 
