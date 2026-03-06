@@ -8,6 +8,7 @@
 
   home.packages = with pkgs; [
     git
+    inputs.wifitui.packages."${pkgs.system}".default
     # Gnome desktop is enabled in configuration.nix system-wide
   ];
 

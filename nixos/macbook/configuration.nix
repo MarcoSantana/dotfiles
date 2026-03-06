@@ -30,7 +30,10 @@
   services.desktopManager.plasma6.enable = true;
 
   # Enable GNOME desktop environment
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;
+
+  # Resolve ssh-askpass conflict between Plasma and GNOME
+  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass";
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -42,7 +45,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;

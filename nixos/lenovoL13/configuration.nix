@@ -32,7 +32,15 @@
 
   # Laptop specific services
   services.thermald.enable = true;
-  services.tlp.enable = true; # Power management
+  services.tlp = {
+    enable = true; # Power management
+    settings = {
+      START_CHARGE_THRESH_BAT0 = 75;
+      STOP_CHARGE_THRESH_BAT0 = 100; # Allow full charge
+      START_CHARGE_THRESH_BAT1 = 75;
+      STOP_CHARGE_THRESH_BAT1 = 100;
+    };
+  };
   services.power-profiles-daemon.enable = pkgs.lib.mkForce false; # Conflicts with TLP
   services.upower.enable = true;
 
@@ -61,6 +69,7 @@
     wget
     git
     brightnessctl
+    tlp
   ];
 
   # Enable Docker
