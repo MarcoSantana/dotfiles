@@ -2,13 +2,65 @@
   :monitor 0
   :geometry (geometry :x "20px"
                      :y "50px"
-                     :width "500px"
+                     :width "400px"
                      :height "600px"
                      :anchor "top left")
   :stacking "bottom"
   :exclusive false
   :focusable false
   (keybinds_box))
+
+(defwindow emacs_keybinds_widget
+  :monitor 0
+  :geometry (geometry :x "430px"
+                     :y "50px"
+                     :width "400px"
+                     :height "700px"
+                     :anchor "top left")
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  (emacs_keybinds_box))
+
+(defwidget emacs_keybinds_box []
+  (box :class "main-box"
+       :orientation "v"
+       :space-evenly false
+    (label :class "title" :text " Emacs / Spacemacs")
+    (scroll :height 650
+      (box :orientation "v"
+           :space-evenly false
+           :spacing 8
+        (label :class "section" :text "󰈔 Files & Buffers")
+        (keybind_item :key "SPC f f" :desc "Find File")
+        (keybind_item :key "SPC f s" :desc "Save File")
+        (keybind_item :key "SPC b b" :desc "Switch Buffer")
+        (keybind_item :key "SPC b d" :desc "Kill Buffer")
+        (keybind_item :key "SPC TAB" :desc "Last Buffer")
+        
+        (label :class "section" :text "󱂬 Windows & Layouts")
+        (keybind_item :key "SPC w /" :desc "Split Vertical")
+        (keybind_item :key "SPC w -" :desc "Split Horizontal")
+        (keybind_item :key "SPC w h/j/k/l" :desc "Move Focus")
+        (keybind_item :key "SPC w d" :desc "Delete Window")
+        (keybind_item :key "SPC w m" :desc "Maximize Window")
+        
+        (label :class "section" :text "󰚰 Projects (Projectile)")
+        (keybind_item :key "SPC p p" :desc "Switch Project")
+        (keybind_item :key "SPC p f" :desc "Find File in Project")
+        (keybind_item :key "SPC p s s" :desc "Search in Project (rg)")
+        (keybind_item :key "SPC p t" :desc "Toggle Treemacs")
+        
+        (label :class "section" :text "󰏘 UI & Themes")
+        (keybind_item :key "SPC T n" :desc "Next Theme")
+        (keybind_item :key "SPC t n" :desc "Line Numbers")
+        (keybind_item :key "SPC t s" :desc "Syntax Checking")
+        
+        (label :class "section" :text "󰅩 LSP & Help")
+        (keybind_item :key "SPC m g d" :desc "Go to Definition")
+        (keybind_item :key "SPC m r r" :desc "Refactor / Rename")
+        (keybind_item :key "SPC h d f" :desc "Describe Function")
+        (keybind_item :key "SPC h d v" :desc "Describe Variable")))))
 
 (defwidget keybinds_box []
   (box :class "main-box"

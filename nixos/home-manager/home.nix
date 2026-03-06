@@ -163,6 +163,7 @@
         "$mod, w, exec, ghostty -e wifitui"
         "$mod SHIFT, m, exec, nwg-displays"
         "$mod, F1, exec, eww open --toggle keybinds_widget"
+        "$mod CONTROL, F1, exec, eww open --toggle emacs_keybinds_widget"
         
         # Focus
         "$mod, H, movefocus, l"
