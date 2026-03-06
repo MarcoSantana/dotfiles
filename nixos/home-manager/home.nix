@@ -94,6 +94,11 @@
     pkgs.hugo
     pkgs.obsidian
 
+    # Sync & Backup
+    pkgs.maestral-gui
+    pkgs.syncthing
+    pkgs.syncthingtray
+
     # Locking & Idle
     pkgs.hyprlock
     pkgs.hypridle
@@ -123,6 +128,8 @@
         "swww init"
         "swww img /home/msantana/dotfiles/assets/wallpapers/orthodox_abstract_1.png"
         "nm-applet --indicator"
+        "maestral_qt"
+        "syncthingtray --wait"
         "swaync"
         "eww open keybinds_widget"
       ];
@@ -506,6 +513,8 @@
 	  defaultCacheTtl = 1800;
 	  enableSshSupport = false;
   };
+
+  services.syncthing.enable = true;
 
   services.ssh-agent.enable = true;
 
