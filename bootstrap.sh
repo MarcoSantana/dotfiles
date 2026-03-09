@@ -117,10 +117,25 @@ if [ -n "$EFI_PATH" ]; then
     if [ -f "$CONFIG_PATH" ]; then
         CONFIG_EFI=$(grep -v "^\s*#" "$CONFIG_PATH" | grep "efiSysMountPoint" | cut -d'"' -f2 || echo "")
         if [ -n "$CONFIG_EFI" ] && [ "$CONFIG_EFI" != "$EFI_PATH" ]; then
-            log_err "Failsafe Triggered: Configuration expects EFI at '$CONFIG_EFI' but it's mounted at '$EFI_PATH'!"
-            log_err "Please update 'boot.loader.efi.efiSysMountPoint' in $CONFIG_PATH to match."
-            if [ "$DRY_RUN" = false ]; then
-                exit 1
+            log_warn "Failsafe Triggered: Configuration expects EFI at '$CONFIG_EFI' but it's mounted at '$EFI_PATH'!"
+            log_info "Updating $CONFIG_PATH to match system mount point..."
+            if [ "$DRY_RUN" = true ]; then
+                log_info "[DRY-RUN] sed -i 's|efiSysMountPoint.*=.*\".*\";|efiSysMountPoint = \"$EFI_PATH\";|' $CONFIG_PATH"
+            else
+                sed -i "s|efiSysMountPoint.*=.*\".*\";|efiSysMountPoint = \"$EFI_PATH\";|" "$CONFIG_PATH"
+            fi
+        elif [ -z "$CONFIG_EFI" ] && [ "$EFI_PATH" != "/boot" ]; then
+            log_info "No 'efiSysMountPoint' found in $CONFIG_PATH (defaults to /boot) but EFI is mounted at '$EFI_PATH'."
+            log_info "Adding configuration to $CONFIG_PATH..."
+            if [ "$DRY_RUN" = true ]; then
+                log_info "[DRY-RUN] Add efiSysMountPoint = \"$EFI_PATH\"; to $CONFIG_PATH"
+            else
+                if grep -q "systemd-boot.enable" "$CONFIG_PATH"; then
+                    sed -i "/systemd-boot.enable/a \  boot.loader.efi.efiSysMountPoint = \"$EFI_PATH\";" "$CONFIG_PATH"
+                else
+                    # Safely append before the last closing brace if it's the last line
+                    sed -i "s/^}$/  boot.loader.efi.efiSysMountPoint = \"$EFI_PATH\";\n}/" "$CONFIG_PATH"
+                fi
             fi
         fi
     fi
