@@ -111,6 +111,7 @@
     pkgs.password-store
     pkgs.gnupg
     pkgs.pinentry-gnome3
+    pkgs.rofi-pass-wayland
 
     # Locking & Idle
     pkgs.hyprlock

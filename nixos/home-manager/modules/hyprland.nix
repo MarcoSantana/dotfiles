@@ -45,6 +45,7 @@
         "$mod SHIFT, d, exec, insomnia"
         "$mod SHIFT, L, exec, loginctl lock-session"
         "$mod, w, exec, ghostty -e wifitui"
+        "$mod, semicolon, exec, rofi-pass"
         "$mod SHIFT, m, exec, nwg-displays"
         "$mod, F1, exec, eww open --toggle keybinds_widget"
         "$mod CONTROL, F1, exec, eww open --toggle emacs_keybinds_widget"
