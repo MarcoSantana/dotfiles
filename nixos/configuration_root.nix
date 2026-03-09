@@ -122,7 +122,11 @@
   environment.systemPackages = with pkgs; [
     neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
-    emacs29
+    git
+    libreoffice-qt
+    hunspell
+    hunspellDicts.es_MX
+    hunspellDicts.en
   ];
 
   # Atomatic garbage collection
