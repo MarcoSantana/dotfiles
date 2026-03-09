@@ -22,11 +22,14 @@
         "syncthingtray --wait"
         "swaync"
         "eww open keybinds_widget"
+        "[workspace special:scratchpad silent] kitty --title scratchpad"
       ];
       bind = [
         "$mod, Return, exec, ghostty"
+        "$mod SHIFT, Return, exec, kitty --title floating_term"
         "$mod, Q, killactive,"
         "$mod, SPACE, exec, rofi -show drun"
+        "$mod SHIFT, SPACE, togglefloating,"
         "$mod, b, exec, zen"
         "$mod SHIFT, b, exec, google-chrome-stable"
         "$mod, m, fullscreen,"
@@ -35,7 +38,8 @@
         # Applications
         "$mod, e, exec, emacsclient -c -a ''"
         "$mod CONTROL, e, exec, emacsclient -c -a ''" # Emacs Anywhere shortcut
-        "$mod, g, exec, ghostty -e lazygit"
+        "$mod CONTROL, g, exec, ghostty -e lazygit"
+        "$mod, g, togglegroup,"
         "$mod SHIFT, g, exec, github-desktop"
         "$mod SHIFT, n, exec, neovide"
         "$mod, p, exec, ghostty -e btop"
@@ -59,6 +63,10 @@
         # Cycle Windows (a la Alt+Tab)
         "$mod, Tab, cyclenext,"
         "$mod SHIFT, Tab, cyclenext, prev"
+
+        # Groups (Stacking)
+        "$mod, bracketleft, changegroupactive, b"
+        "$mod, bracketright, changegroupactive, f"
 
         # Workspaces
         "$mod, 1, workspace, 1"
@@ -87,6 +95,8 @@
         # Special Workspace
         "$mod, S, togglespecialworkspace, magic"
         "$mod SHIFT, S, movetoworkspace, special:magic"
+        "$mod, Grave, togglespecialworkspace, scratchpad"
+        "$mod SHIFT, Grave, movetoworkspace, special:scratchpad"
 
         # Keybinds Helper
         "$mod, F1, exec, ~/dotfiles/scripts/keybinds.sh"
@@ -162,6 +172,24 @@
         "col.inactive_border" = "rgba(44475aaa)";
         layout = "dwindle";
       };
+      windowrulev2 = [
+        "float, title:^(floating_term)$"
+        "size 80% 80%, title:^(floating_term)$"
+        "center, title:^(floating_term)$"
+
+        "workspace special:scratchpad, title:^(scratchpad)$"
+      ];
     };
+    extraConfig = ''
+      # Resize Submap
+      bind = $mod, R, submap, resize
+      submap = resize
+      binde = , l, resizeactive, 15 0
+      binde = , h, resizeactive, -15 0
+      binde = , k, resizeactive, 0 -15
+      binde = , j, resizeactive, 0 15
+      bind = , escape, submap, reset
+      submap = reset
+    '';
   };
 }
