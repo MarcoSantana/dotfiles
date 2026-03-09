@@ -79,3 +79,35 @@ git pull --rebase
 # Bring back your local edits
 git stash pop
 ```
+
+## 🔐 l337 Password Management (pass + GPG)
+
+This configuration uses `pass` (the standard unix password manager) integrated with GPG and Hyprland for a seamless, secure experience.
+
+### ⌨️ Quick Access (Hyprland)
+- **`$mod + ;` (Semicolon)**: Opens `rofi-pass`. 
+  - Search for an entry and press **Enter** to auto-type the password.
+  - Use **Shift+Enter** to just copy it to the clipboard.
+  - It handles GPG passphrase prompts via a GNOME pinentry popup.
+
+### 💻 Terminal Usage
+- **Add a password**: `pass insert <path/to/service>`
+- **Generate a password**: `pass generate <path/to/service> <length>`
+- **Show/Copy password**: `pass <path/to/service>` (copies to clipboard for 45s)
+- **List all**: `pass`
+
+### 🛡️ Security & Backup
+- **GPG Key**: Your passwords are encrypted with your GPG key (`marco.santana@gmail.com`).
+- **Git Integration**: Every change is automatically committed to `~/.password-store/.git`.
+- **Cloud Sync**: To backup to a private repo:
+  ```bash
+  cd ~/.password-store
+  pass git remote add origin <your-private-git-repo-url>
+  pass git push -u origin main
+  ```
+
+### 🔄 Multi-Machine Setup
+To use your passwords on your other machines (MacBook/Lenovo):
+1. Export your GPG private key: `gpg --export-secret-keys --armor > mykey.asc`
+2. Import it on the new machine: `gpg --import mykey.asc`
+3. Clone your password store: `git clone <repo-url> ~/.password-store`
