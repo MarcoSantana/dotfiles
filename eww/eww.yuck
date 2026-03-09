@@ -72,23 +72,33 @@
            :space-evenly false
            :spacing 10
         (keybind_item :key "mod + Return" :desc "Terminal (Ghostty)")
-        (keybind_item :key "mod + w" :desc "Wifi (wifitui)")
-        (keybind_item :key "mod + m" :desc "Full screen")
-        (keybind_item :key "mod + Shift + m" :desc "Displays (nwg)")
+        (keybind_item :key "mod + Shift + Return" :desc "Floating Terminal")
+        (keybind_item :key "mod + Grave" :desc "Toggle Scratchpad")
         (keybind_item :key "mod + SPACE" :desc "Rofi Launcher")
+        (keybind_item :key "mod + Shift + SPACE" :desc "Toggle Float")
+        (keybind_item :key "mod + m" :desc "Full screen")
+        (keybind_item :key "mod + R" :desc "Resize Mode")
         (keybind_item :key "mod + q" :desc "Kill Active Window")
-        (keybind_item :key "mod + F1" :desc "Keybinds Helper (Eww)")
-        (keybind_item :key "mod + D" :desc "Dashboard (Eww)")
+        
+        (label :class "section" :text "󱂬 Windows & Stacks")
+        (keybind_item :key "mod + g" :desc "Toggle Stack (Group)")
+        (keybind_item :key "mod + [/]" :desc "Cycle Stack Window")
+        (keybind_item :key "mod + Tab" :desc "Cycle Next Window")
+        (keybind_item :key "mod + [0-9]" :desc "Switch Workspace")
+
+        (label :class "section" :text "󰈔 Applications")
         (keybind_item :key "mod + e" :desc "Emacs")
         (keybind_item :key "mod + b" :desc "Zen Browser")
         (keybind_item :key "mod + SHIFT + b" :desc "Google Chrome")
-        (keybind_item :key "mod + g" :desc "Lazygit")
+        (keybind_item :key "mod + Ctrl + g" :desc "Lazygit")
         (keybind_item :key "mod + p" :desc "Btop")
         (keybind_item :key "mod + t" :desc "Bottom (Monitor)")
-        (keybind_item :key "mod + Shift + p" :desc "Screenshot")
+        (keybind_item :key "mod + w" :desc "Wifi (wifitui)")
         (keybind_item :key "mod + v" :desc "Audio Control")
-        (keybind_item :key "mod + Tab" :desc "Cycle Next Window")
-        (keybind_item :key "mod + [0-9]" :desc "Switch Workspace")))))
+        (keybind_item :key "mod + Shift + m" :desc "Displays (nwg)")
+        (keybind_item :key "mod + Shift + p" :desc "Screenshot")
+        (keybind_item :key "mod + F1" :desc "Keybinds Helper (Eww)")
+        (keybind_item :key "mod + D" :desc "Dashboard (Eww)")))))
       
 
 (defwidget keybind_item [key desc]
