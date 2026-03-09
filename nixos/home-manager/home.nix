@@ -53,6 +53,10 @@
     pkgs.xh
     pkgs.doggo
     pkgs.insomnia
+    pkgs.libreoffice-qt
+    pkgs.hunspell
+    pkgs.hunspellDicts.es_MX
+    pkgs.hunspellDicts.en_US
 
     # TUI Power Tools
     pkgs.lazygit
@@ -381,8 +385,6 @@
           --vfs-cache-max-size 10G \
           --vfs-read-chunk-size 32M \
           --no-modtime \
-          --addr-refresh-interval 5m \
-          --vfs-proxy-logging \
           --daemon-timeout 10m
       '';
       ExecStop = "/run/current-system/sw/bin/fusermount -u %h/GoogleDrive";
