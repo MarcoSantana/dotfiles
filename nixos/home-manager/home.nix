@@ -92,6 +92,8 @@
     pkgs.poppler-utils
     pkgs.ocrmypdf
     pkgs.chafa
+    pkgs.imagemagick
+    (pkgs.callPackage ../../pkgs/img2webp.nix {})
 
     # Markdown Power Tools
     pkgs.glow
@@ -106,6 +108,9 @@
     pkgs.syncthing
     pkgs.syncthingtray
     pkgs.rclone
+    pkgs.password-store
+    pkgs.gnupg
+    pkgs.pinentry-gnome3
 
     # Locking & Idle
     pkgs.hyprlock
@@ -365,6 +370,15 @@
 	  enable = true;
 	  defaultCacheTtl = 1800;
 	  enableSshSupport = false;
+    pinentryPackage = pkgs.pinentry-gnome3;
+  };
+
+  programs.password-store = {
+    enable = true;
+    package = pkgs.password-store.withExtensions (exts: [ exts.pass-otp ]);
+    settings = {
+      PASSWORD_STORE_DIR = "$HOME/.password-store";
+    };
   };
 
   services.syncthing.enable = true;
