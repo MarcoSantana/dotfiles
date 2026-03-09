@@ -52,6 +52,7 @@
         "$mod, semicolon, exec, rofi-pass"
         "$mod SHIFT, m, exec, nwg-displays"
         "$mod, F1, exec, eww open --toggle keybinds_widget"
+        "$mod SHIFT, F1, exec, ~/dotfiles/scripts/keybinds.sh"
         "$mod CONTROL, F1, exec, eww open --toggle emacs_keybinds_widget"
         
         # Focus
@@ -95,11 +96,8 @@
         # Special Workspace
         "$mod, S, togglespecialworkspace, magic"
         "$mod SHIFT, S, movetoworkspace, special:magic"
-        "$mod, Grave, togglespecialworkspace, scratchpad"
-        "$mod SHIFT, Grave, movetoworkspace, special:scratchpad"
-
-        # Keybinds Helper
-        "$mod, F1, exec, ~/dotfiles/scripts/keybinds.sh"
+        "$mod CONTROL, SPACE, togglespecialworkspace, scratchpad"
+        "$mod SHIFT CONTROL, SPACE, movetoworkspace, special:scratchpad"
       ];
       bindel = [
         # Volume Control
