@@ -108,7 +108,6 @@
     pkgs.syncthing
     pkgs.syncthingtray
     pkgs.rclone
-    pkgs.password-store
     pkgs.gnupg
     pkgs.pinentry-gnome3
     pkgs.rofi-pass-wayland
@@ -371,12 +370,12 @@
 	  enable = true;
 	  defaultCacheTtl = 1800;
 	  enableSshSupport = false;
-    pinentryPackage = pkgs.pinentry-gnome3;
+    pinentry.package = pkgs.pinentry-gnome3;
   };
 
   programs.password-store = {
     enable = true;
-    package = pkgs.password-store.withExtensions (exts: [ exts.pass-otp ]);
+    package = pkgs.pass.withExtensions (exts: [ exts.pass-otp ]);
     settings = {
       PASSWORD_STORE_DIR = "$HOME/.password-store";
     };
@@ -416,24 +415,28 @@
 
   programs.git = {
     enable = true;
-    userName = "MarcoSantana";
-    userEmail = "marco.santana@gmail.com";
     lfs.enable = true;
-    delta = {
-      enable = true;
-      options = {
-        line-numbers = true;
-        side-by-side = true;
-        navigate = true;
-        syntax-theme = "Dracula";
+    settings = {
+      user = {
+        name = "MarcoSantana";
+        email = "marco.santana@gmail.com";
       };
-    };
-    extraConfig = {
       color.ui = true;
       core.editor = "nvim";
       push.autoSetupRemote = true;
       pull.rebase = true;
       init.defaultBranch = "main";
+    };
+  };
+
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      line-numbers = true;
+      side-by-side = true;
+      navigate = true;
+      syntax-theme = "Dracula";
     };
   };
 
@@ -454,6 +457,7 @@
 
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     matchBlocks."*" = {
       addKeysToAgent = "yes";
     };
