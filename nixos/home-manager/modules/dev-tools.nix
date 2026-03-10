@@ -7,7 +7,6 @@
     python3
     go
     rustup
-    lua5_1
     luajit
     gcc
     gnumake
