@@ -7,26 +7,31 @@
   home.stateVersion = "24.11";
 
   home.packages = with pkgs; [
+    # Admin & Debugging
     git
-    inputs.wifitui.packages."${pkgs.system}".default
-    # Gnome desktop is enabled in configuration.nix system-wide
+    wget
+    curl
+    ripgrep
+    fd
+    htop
+    pciutils
+    usbutils
+    
+    # Simple editor for quick fixes (no Emacs/Neovim setup required here)
+    vim
+    
+    # Modern communication for you
+    slack
+    discord
   ];
 
   programs.home-manager.enable = true;
 
-  # Map Caps Lock to Ctrl in GNOME
-  dconf.settings = {
-    "org/gnome/desktop/input-sources" = {
-      xkb-options = [ "ctrl:nocaps" ];
-    };
-  };
-
-  # Map Caps Lock to Ctrl in Hyprland
-  wayland.windowManager.hyprland = {
-    settings = {
-      input = {
-        kb_options = "ctrl:nocaps";
-      };
-    };
+  # Shell configuration for you on the MacBook
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
   };
 }

@@ -25,30 +25,40 @@
   time.timeZone = "America/Mexico_City"; # Adjust as needed
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.defaultLocale = "es_MX.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "es_MX.UTF-8";
+    LC_IDENTIFICATION = "es_MX.UTF-8";
+    LC_MEASUREMENT = "es_MX.UTF-8";
+    LC_MONETARY = "es_MX.UTF-8";
+    LC_NAME = "es_MX.UTF-8";
+    LC_NUMERIC = "es_MX.UTF-8";
+    LC_PAPER = "es_MX.UTF-8";
+    LC_TELEPHONE = "es_MX.UTF-8";
+    LC_TIME = "es_MX.UTF-8";
+  };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-
   # Enable GNOME desktop environment
-  services.desktopManager.gnome.enable = true;
-
-  # Resolve ssh-askpass conflict between Plasma and GNOME
-  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass";
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
-    layout = "us";
+    layout = "latam"; # Latin American layout is usually better for MX MacBooks
     variant = "";
     options = "ctrl:nocaps,compose:ralt";
   };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -105,24 +115,49 @@
   users.users.dcampuzano = {
     isNormalUser = true;
     description = "Danelia Campuzano";
-    extraGroups = [ "networkmanager" "wheel" "lp" "scanner" ];
+    extraGroups = [ "networkmanager" "wheel" "lp" "scanner" "video" ];
   };
 
+  # Admin user (You)
   users.users.msantana = {
     isNormalUser = true;
-    description = "Marco Santana";
-    extraGroups = [ "networkmanager" "wheel" ];
+    description = "Marco Santana (Admin)";
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
   };
 
-  # --- System Packages ---
+  # --- System Packages & Fonts ---
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.roboto-mono
+    google-fonts
+    corefonts # Microsoft fonts for LibreOffice compatibility
+    vistafonts # Calibri, etc.
+  ];
+
   environment.systemPackages = with pkgs; [
+    # Core Utilities
     vim
     wget
     git
-    sbctl # Secure boot tools if needed
+    sbctl
+    
+    # GNOME Goodies
+    gnome-tweaks
+    gnome-extension-manager
+    
+    # Productivity (System-wide)
+    libreoffice-fresh
     hunspell
     hunspellDicts.es_MX
     hunspellDicts.en_US
+    hyphen
+    aspell
+    aspellDicts.es
+    
+    # Graphics/PDF
+    evince
+    eog
+    gimp
   ];
 
   system.stateVersion = "24.11"; # Did you read the comment?

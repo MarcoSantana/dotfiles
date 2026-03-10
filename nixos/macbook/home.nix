@@ -9,38 +9,40 @@
   home.packages = with pkgs; [
     # Browsers
     google-chrome
-    firefox
     
-    # Productivity
+    # Productivity (User Friendly)
     libreoffice-fresh
-    
-    # PDF Tools
-    pkgs.kdePackages.okular
+    pkgs.hunspellDicts.es_MX
     
     # Communications
-    pkgs.whatsapp-electron
+    whatsapp-for-linux
+    telegram-desktop
     
-    # System Utils (User-friendly)
-    pkgs.kdePackages.spectacle # Screenshot
-    pkgs.kdePackages.gwenview # Image viewer
+    # Utilities
+    gnome-weather
+    gnome-maps
+    gnome-calculator
+    baobab # Disk usage analyzer
+    
+    # Graphics
+    loupe # Modern GNOME image viewer
+    evince # PDF viewer
   ];
+
+  # GTK/GNOME Preference
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      locate-pointer = true;
+    };
+    "org/gnome/desktop/wm/preferences" = {
+      button-layout = "appmenu:minimize,maximize,close";
+    };
+  };
 
   # Enable Home Manager to manage itself
   programs.home-manager.enable = true;
 
-  # User-friendly Shell setup
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-  };
-
-  # Simple and clean prompt
-  programs.starship = {
-    enable = true;
-    settings = {
-      add_newline = false;
-    };
-  };
+  # Simple and clean bash configuration (don't force ZSH for her)
+  programs.bash.enable = true;
 }
