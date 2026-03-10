@@ -17,7 +17,6 @@
     lua-language-server # Lua
     pyright # Python
     gopls # Go
-    rust-analyzer # Rust
     typescript-language-server # TS/JS
     vscode-langservers-extracted # HTML/CSS/JSON/ESLint
     bash-language-server # Bash
