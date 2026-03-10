@@ -6,6 +6,7 @@
     ./hypridle.nix
     ./modules/dev-tools.nix
     ./modules/emacs.nix
+    ./modules/graphics.nix
     ./modules/hyprland.nix
     ./modules/nvim.nix
   ];
