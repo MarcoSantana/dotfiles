@@ -8,9 +8,13 @@
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
-  boot.loader.grub.enable = false;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
+  
+  # Explicitly disable GRUB to prevent conflicts
+  boot.loader.grub.enable = false;
+  # Prevent any accidental GRUB installation to a generic device
+  boot.loader.grub.device = "nodev";
 
   networking.hostName = "macbook"; # Define your hostname.
   

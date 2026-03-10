@@ -13,16 +13,16 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  # Minimal file systems placeholder
+  # Minimal file systems placeholder - PLEASE REGENERATE ON DEVICE
+  # sudo nixos-generate-config --show-hardware-config > nixos/macbook/hardware-configuration.nix
   fileSystems."/" =
-    { device = "/dev/disk/by-label/nixos";
+    { device = "/dev/disk/by-label/nixos"; # Ensure your root partition is labeled 'nixos'
       fsType = "ext4";
     };
 
-  # EFI boot partition – replace label/UUID with your actual device after running
-  # nixos-generate-config on the MacBook
+  # EFI boot partition
   fileSystems."/boot" =
-    { device = "/dev/disk/by-label/boot";
+    { device = "/dev/disk/by-label/boot"; # Ensure your EFI partition is labeled 'boot'
       fsType = "vfat";
     };
 
