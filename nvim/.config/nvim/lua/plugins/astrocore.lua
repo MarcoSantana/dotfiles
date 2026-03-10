@@ -42,7 +42,7 @@ return {
         relativenumber = true, -- sets vim.opt.relativenumber
         number = true, -- sets vim.opt.number
         spell = false, -- sets vim.opt.spell (managed by autocmd for specific filetypes)
-        spelllang = "en,es", -- sets vim.opt.spelllang
+        spelllang = "en_us,es,es_mx", -- sets vim.opt.spelllang
         signcolumn = "yes", -- sets vim.opt.signcolumn to yes
         wrap = false, -- sets vim.opt.wrap
       },

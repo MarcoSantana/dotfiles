@@ -3,10 +3,27 @@
 {
   services.emacs = {
     enable = true;
-    package = pkgs.emacs-unstable;
+    package = pkgs.emacs-unstable-pgtk;
     client.enable = true;
     defaultEditor = false;
   };
+
+  # Extra Emacs Dependencies
+  home.packages = with pkgs; [
+    # Spell checking
+    ispell
+    aspell
+    aspellDicts.es
+    aspellDicts.en
+    aspellDicts.en-computers
+
+    # Build tools for Emacs packages (e.g. vterm, pdf-tools)
+    libtool
+    cmake
+    pkg-config
+    gnutls
+    imagemagick
+  ];
 
   home.file = {
     ".config/emacs".source = config.lib.file.mkOutOfStoreSymlink "/home/msantana/dotfiles/emacs/.config/emacs";

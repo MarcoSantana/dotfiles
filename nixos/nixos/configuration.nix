@@ -65,6 +65,7 @@
   services.xserver.xkb = {
     layout = "us";
     variant = "";
+    options = "ctrl:nocaps,compose:ralt";
   };
 
   # Enable CUPS to print documents.
@@ -184,6 +185,9 @@
     wget
     git
     emacs-unstable # From overlay
+    hunspell
+    hunspellDicts.es_MX
+    hunspellDicts.en_US
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

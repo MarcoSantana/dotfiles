@@ -40,6 +40,7 @@
   services.xserver.xkb = {
     layout = "us";
     variant = "";
+    options = "ctrl:nocaps,compose:ralt";
   };
 
   # Enable CUPS to print documents.
@@ -115,6 +116,9 @@
     wget
     git
     sbctl # Secure boot tools if needed
+    hunspell
+    hunspellDicts.es_MX
+    hunspellDicts.en_US
   ];
 
   system.stateVersion = "24.11"; # Did you read the comment?

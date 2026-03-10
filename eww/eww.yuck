@@ -72,8 +72,8 @@
            :space-evenly false
            :spacing 10
         (keybind_item :key "mod + Return" :desc "Terminal (Ghostty)")
-        (keybind_item :key "mod + Shift + Return" :desc "Floating Terminal")
-        (keybind_item :key "mod + Grave" :desc "Toggle Scratchpad")
+        (keybind_item :key "mod + Shift + Return" :desc "Floating Terminal (Ghostty)")
+        (keybind_item :key "mod + Ctrl + SPACE" :desc "Toggle Scratchpad")
         (keybind_item :key "mod + SPACE" :desc "Rofi Launcher")
         (keybind_item :key "mod + Shift + SPACE" :desc "Toggle Float")
         (keybind_item :key "mod + m" :desc "Full screen")
@@ -81,6 +81,7 @@
         (keybind_item :key "mod + q" :desc "Kill Active Window")
         
         (label :class "section" :text "󱂬 Windows & Stacks")
+        (keybind_item :key "ALT + Tab" :desc "Cycle Window")
         (keybind_item :key "mod + g" :desc "Toggle Stack (Group)")
         (keybind_item :key "mod + [/]" :desc "Cycle Stack Window")
         (keybind_item :key "mod + Tab" :desc "Cycle Next Window")
@@ -96,12 +97,11 @@
         (keybind_item :key "mod + w" :desc "Wifi (wifitui)")
         (keybind_item :key "mod + v" :desc "Audio Control")
         (keybind_item :key "mod + Shift + m" :desc "Displays (nwg)")
-        (keybind_item :key "mod + Shift + p" :desc "Screenshot")
-        (keybind_item :key "mod + F1" :desc "Keybinds Helper (Eww)")
-        (keybind_item :key "mod + D" :desc "Dashboard (Eww)")))))
-      
-
-(defwidget keybind_item [key desc]
+                (keybind_item :key "mod + Shift + p" :desc "Screenshot")
+                (keybind_item :key "mod + F1" :desc "Keybinds Helper (Eww)")))))
+        
+        (defwidget keybind_item [key desc]
+        
   (box :class "item"
        :orientation "h"
        :space-evenly false

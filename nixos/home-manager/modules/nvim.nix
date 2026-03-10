@@ -1,8 +1,27 @@
 { config, pkgs, ... }:
 
 {
+  programs.neovim = {
+    enable = true;
+    defaultEditor = false;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
+    withNodeJs = true;
+    withPython3 = true;
+    withRuby = true;
+
+    # Treesitter dependencies
+    extraPackages = with pkgs; [
+      gcc
+      gnumake
+      unzip
+      wget
+      curl
+    ];
+  };
+
   home.packages = [
-    pkgs.neovim
     pkgs.neovide
   ];
 

@@ -4,6 +4,7 @@
   imports = [
     ./hyprlock.nix
     ./hypridle.nix
+    ./modules/dev-tools.nix
     ./modules/emacs.nix
     ./modules/hyprland.nix
     ./modules/nvim.nix
@@ -47,7 +48,6 @@
     '')
 
     # Productivity tools
-    pkgs.btop
     pkgs.espanso
     pkgs.dust
     pkgs.xh
@@ -57,11 +57,6 @@
     pkgs.hunspell
     pkgs.hunspellDicts.es_MX
     pkgs.hunspellDicts.en_US
-
-    # TUI Power Tools
-    pkgs.lazygit
-    pkgs.lazydocker
-    pkgs.bottom
 
     # Wayland Essentials
     pkgs.waybar
@@ -79,7 +74,6 @@
     pkgs.ranger
     pkgs.ghostty
     pkgs.github-desktop
-    pkgs.rubyPackages_3_3.solargraph
     
     # Typst & PDF Power Tools
     pkgs.typst
@@ -97,7 +91,6 @@
 
     # Markdown Power Tools
     pkgs.glow
-    pkgs.marksman
     pkgs.markdownlint-cli2
     pkgs.mermaid-cli
     pkgs.hugo

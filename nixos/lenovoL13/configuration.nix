@@ -23,6 +23,13 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
 
+  # Configure keymap in X11
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+    options = "ctrl:nocaps,compose:ralt";
+  };
+
   # Set Hyprland as default session
   programs.hyprland = {
     enable = true;
@@ -70,6 +77,9 @@
     git
     brightnessctl
     tlp
+    hunspell
+    hunspellDicts.es_MX
+    hunspellDicts.en_US
   ];
 
   # Enable Docker

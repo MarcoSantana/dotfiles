@@ -11,7 +11,7 @@
         force_zero_scaling = true;
       };
       input = {
-        kb_options = "ctrl:nocaps";
+        kb_options = "ctrl:nocaps,compose:ralt";
       };
       exec-once = [
         "waybar"
@@ -22,18 +22,17 @@
         "syncthingtray --wait"
         "swaync"
         "eww open keybinds_widget"
-        "[workspace special:scratchpad silent] kitty --title scratchpad"
+        "[workspace special:scratchpad silent] ghostty --title=scratchpad"
       ];
       bind = [
         "$mod, Return, exec, ghostty"
-        "$mod SHIFT, Return, exec, kitty --title floating_term"
+        "$mod SHIFT, Return, exec, ghostty --title=floating_term"
         "$mod, Q, killactive,"
         "$mod, SPACE, exec, rofi -show drun"
         "$mod SHIFT, SPACE, togglefloating,"
         "$mod, b, exec, zen"
         "$mod SHIFT, b, exec, google-chrome-stable"
         "$mod, m, fullscreen,"
-        "$mod, D, exec, eww open --toggle dashboard"
 
         # Applications
         "$mod, e, exec, emacsclient -c -a ''"
@@ -62,6 +61,8 @@
         "$mod, J, movefocus, d"
 
         # Cycle Windows (a la Alt+Tab)
+        "ALT, Tab, cyclenext,"
+        "ALT, Tab, bringactivetotop,"
         "$mod, Tab, cyclenext,"
         "$mod SHIFT, Tab, cyclenext, prev"
 

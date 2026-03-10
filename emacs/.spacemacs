@@ -54,7 +54,8 @@ This function should only modify configuration layer settings."
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
-     spell-checking
+     (spell-checking :variables
+                     spell-checking-languages '("en_US" "es_MX"))
      syntax-checking
      version-control
      treemacs)
