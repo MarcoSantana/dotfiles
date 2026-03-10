@@ -1,3 +1,4 @@
+# Version: 2026-11-01
 # This is a placeholder for hardware-configuration.nix
 # On the actual MacBook, run:
 # sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
@@ -12,6 +13,11 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
+
+  # Explicitly stating we want EFI boot, not legacy BIOS
+  boot.loader.systemd-boot.enable = lib.mkDefault true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
+  boot.loader.grub.efiSupport = lib.mkDefault true;
 
   # Minimal file systems placeholder - PLEASE REGENERATE ON DEVICE
   # sudo nixos-generate-config --show-hardware-config > nixos/macbook/hardware-configuration.nix

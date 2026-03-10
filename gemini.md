@@ -26,6 +26,17 @@ Cuando necesites ayuda para modificar tus configs, usa estos prompts rápidos:
 
 ---
 
+## 🏷️ Estándar de Versionado
+
+A partir de ahora, cada archivo de configuración debe incluir un comentario con su versión en el formato:
+`yyyy-[week_number]-number`
+
+- **Ejemplo:** `# Version: 2026-11-01`
+- **Ubicación:** Al inicio del archivo (o donde sea pertinente según el formato).
+- **Frecuencia:** Se incrementa el `number` con cada cambio realizado durante la misma semana.
+
+---
+
 ## 📜 Prompts de Ingeniería (System Prompts)
 
 Copia y pega esto al iniciar una sesión de Gemini CLI para que sepa quién eres y qué buscas:
