@@ -1,3 +1,4 @@
+# Version: 2026-11-01
 { config, pkgs, inputs, ... }:
 
 {
@@ -80,6 +81,10 @@
     hunspell
     hunspellDicts.es_MX
     hunspellDicts.en_US
+    
+    # AI Powered Image Upscaling
+    upscayl
+    upscaler # Backup upscaler
   ];
 
   # Enable Docker
