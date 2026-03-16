@@ -5,6 +5,7 @@
   imports = [
     # Hardware configuration will be generated on the device and imported here
     ./hardware-configuration.nix
+    ../common.nix
   ];
 
   # Use the systemd-boot EFI boot loader.
@@ -73,8 +74,6 @@
 
   # --- MacBook Specific Hardware Support ---
   
-  # Allow unfree for Broadcom drivers
-  nixpkgs.config.allowUnfree = true;
   nixpkgs.config.permittedInsecurePackages = [
     "broadcom-sta-6.30.223.271-59-6.12.74"
   ];

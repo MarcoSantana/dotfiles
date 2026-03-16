@@ -18,9 +18,13 @@
       url = "github:shazow/wifitui";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-cosmic = {
+      url = "github:lilyinstarlight/nixos-cosmic";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, emacs-overlay, zen-browser, nixos-hardware, wifitui, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, emacs-overlay, zen-browser, nixos-hardware, wifitui, nixos-cosmic, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -29,6 +33,7 @@
         inherit system;
         specialArgs = { inherit inputs; };
         modules = [
+          nixos-cosmic.nixosModules.default
           ./nixos/nixos/configuration.nix
           home-manager.nixosModules.home-manager
           {
@@ -47,6 +52,7 @@
         inherit system;
         specialArgs = { inherit inputs; };
         modules = [
+          nixos-cosmic.nixosModules.default
           nixos-hardware.nixosModules.apple-macbook-pro-11-5 # Baseline for older MBPs
           ./nixos/macbook/configuration.nix
           home-manager.nixosModules.home-manager
@@ -67,6 +73,7 @@
         inherit system;
         specialArgs = { inherit inputs; };
         modules = [
+          nixos-cosmic.nixosModules.default
           nixos-hardware.nixosModules.lenovo-thinkpad-l13
           ./nixos/lenovoL13/configuration.nix
           home-manager.nixosModules.home-manager

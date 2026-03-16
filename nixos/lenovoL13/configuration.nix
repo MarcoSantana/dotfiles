@@ -4,6 +4,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ../common.nix
   ];
 
   # Use systemd-boot for EFI
@@ -69,9 +70,6 @@
     extraGroups = [ "networkmanager" "wheel" "docker" "video" "input" ];
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   environment.systemPackages = with pkgs; [
     vim
     wget
@@ -86,9 +84,6 @@
     upscayl
     upscaler # Backup upscaler
   ];
-
-  # Enable Docker
-  virtualisation.docker.enable = true;
 
   system.stateVersion = "24.11";
 }

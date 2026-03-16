@@ -9,20 +9,8 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ../common.nix
     ];
-
-    nix = {
-        package = pkgs.nix;
-        settings = {
-          experimental-features = [ "nix-command" "flakes" ];
-          auto-optimise-store = true;
-        };
-        gc = {
-          automatic = true;
-          dates = "weekly";
-          options = "--delete-older-than 7d";
-        };
-    };
   # nixpkgs.overlays = [ (import self.inputs.emacs-overlay) ];
   # Overlays are now handled in flake.nix
   # Bootloader.
@@ -172,8 +160,6 @@
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
   nixpkgs.config.permittedInsecurePackages = [
     "electron-27.3.11"
   ];
@@ -214,8 +200,6 @@
   # Enable Tailscale
   services.tailscale.enable = true;
 
-  # Enable Docker
-  virtualisation.docker.enable = true;
   users.users.msantana.extraGroups = [ "networkmanager" "wheel" "docker" ];
 
   # Fonts
