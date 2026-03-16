@@ -31,7 +31,8 @@
   };
 
   home.sessionVariables = {
-    EDITOR = "emacsclient -c -a ''";
+    EDITOR = "emacsclient -t -a ''";
+    VISUAL = "emacsclient -c -a ''";
   };
 
   programs.zsh.shellAliases = {

@@ -87,6 +87,11 @@
     pkgs.ocrmypdf
     pkgs.chafa
     pkgs.imagemagick
+    pkgs.python3Packages.pillow
+    pkgs.ffmpegthumbnailer
+    pkgs.atool
+    pkgs.mediainfo
+    pkgs.file
     (pkgs.callPackage ../../pkgs/img2webp.nix {})
 
     # Markdown Power Tools
@@ -372,6 +377,9 @@
     initContent = ''
       # Preserve existing .zshrc logic
       source ~/dotfiles/zsh/.zshrc
+      
+      # FNM (Fast Node Manager)
+      eval "$(fnm env --use-on-cd)"
     '';
   };
 
@@ -635,6 +643,45 @@
     };
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
+    };
+  };
+
+  programs.vscode = {
+    enable = true;
+    package = pkgs.vscodium;
+    extensions = with pkgs.vscode-extensions; [
+      dracula-theme.theme-dracula
+      vscodevim.vim
+      ms-ceintl.vscode-language-pack-es
+      
+      # Vue 3 & Frontend
+      vue.volar
+      vue.vscode-typescript-vue-plugin
+      bradlc.vscode-tailwindcss
+      dbaeumer.vscode-eslint
+      esbenp.prettier-vscode
+      
+      # Backend & SQL
+      ms-azuretools.vscode-docker
+      redhat.vscode-yaml
+      tamasfe.even-better-toml
+      
+      # Supabase & SQL
+      ckipp01.proxmox-vscode # (Just an example, actual supabase extension might be in marketplace)
+    ];
+    userSettings = {
+      "editor.fontSize" = 14;
+      "editor.fontFamily" = "'JetBrainsMono Nerd Font', 'monospace'";
+      "workbench.colorTheme" = "Dracula";
+      "editor.formatOnSave" = true;
+      "editor.defaultFormatter" = "esbenp.prettier-vscode";
+      "editor.bracketPairColorization.enabled" = true;
+      "editor.guides.bracketPairs" = "active";
+      "vim.useSystemClipboard" = true;
+      "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
+      "files.autoSave" = "afterDelay";
+      "window.titleBarStyle" = "custom";
+      "editor.inlineSuggest.enabled" = true;
     };
   };
 

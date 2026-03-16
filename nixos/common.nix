@@ -22,6 +22,14 @@
   # Enable COSMIC Desktop as fallback
   services.desktopManager.cosmic.enable = true;
 
+  # Container Runtimes
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
+  virtualisation.docker.enable = true;
+
   # Limit the number of generations shown in the boot menu
   boot.loader.systemd-boot.configurationLimit = lib.mkDefault 10;
 }
