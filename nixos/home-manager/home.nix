@@ -667,7 +667,7 @@
       tamasfe.even-better-toml
       
       # Supabase & SQL
-      ckipp01.proxmox-vscode # (Just an example, actual supabase extension might be in marketplace)
+      supabase.supabase
     ];
     userSettings = {
       "editor.fontSize" = 14;
