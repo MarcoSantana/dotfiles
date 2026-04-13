@@ -1,4 +1,3 @@
-
 -- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
 -- Configuration documentation can be found with `:h astrocore`
 -- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
@@ -44,7 +43,10 @@ return {
         spell = false, -- sets vim.opt.spell (managed by autocmd for specific filetypes)
         spelllang = "en,es", -- sets vim.opt.spelllang
         signcolumn = "yes", -- sets vim.opt.signcolumn to yes
-        wrap = false, -- sets vim.opt.wrap
+        wrap = true, -- sets vim.opt.wrap
+        linebreak = true, -- sets vim.opt.linebreak
+        breakindent = true, -- sets vim.opt.breakindent
+        showbreak = "↳ ", -- sets vim.opt.showbreak
       },
       g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)
@@ -86,10 +88,22 @@ return {
 
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
-        -- ["<Leader>b"] = { desc = "Buffers" },
+        ["<Leader>i"] = { desc = "Intelligence" },
+        ["<Leader>ic"] = { "<cmd>CodeCompanionChat Toggle<cr>", desc = "Toggle Chat" },
+        ["<Leader>ia"] = { "<cmd>CodeCompanionActions<cr>", desc = "CodeCompanion Actions" },
+        ["<Leader>ii"] = { "<cmd>CodeCompanion<cr>", desc = "Inline Assistant" },
+        ["<Leader>is"] = { "<cmd>CodeCompanionCmd<cr>", desc = "Slash Commands" },
 
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
+      },
+      v = {
+        ["<Leader>i"] = { desc = "Intelligence" },
+        ["<Leader>ic"] = { "<cmd>CodeCompanionChat Toggle<cr>", desc = "Toggle Chat" },
+        ["<Leader>ia"] = { "<cmd>CodeCompanionActions<cr>", desc = "CodeCompanion Actions" },
+        ["<Leader>ii"] = { "<cmd>CodeCompanion<cr>", desc = "Inline Assistant" },
+        ["<Leader>is"] = { "<cmd>CodeCompanionCmd<cr>", desc = "Slash Commands" },
+        ["<Leader>iA"] = { "<cmd>CodeCompanionChat Add<cr>", desc = "Add to Chat" },
       },
     },
   },

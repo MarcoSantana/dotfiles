@@ -120,3 +120,28 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 eval "$(~/.local/bin/mise activate)"
+
+# Podman rootless socket (set by popOs_podman_setup.sh)
+export DOCKER_HOST="unix:///run/user/1000/podman/podman.sock"
+eval "$(zoxide init bash)"
+
+# ---- Modern CLI ----
+
+alias ls="eza --icons --group-directories-first"
+alias ll="eza -lah --icons --git"
+alias tree="eza --tree --icons"
+
+alias cat="bat"
+
+# fastfetch on start
+fastfetch
+
+# starship prompt
+eval "$(starship init bash)"
+
+# fzf
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+export PATH="$HOME/.local/bin:$PATH"
+source ~/.fzf.bash
+alias tmux="tmux -f ~/.config/tmux/tmux.conf"

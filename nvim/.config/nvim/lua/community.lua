@@ -20,4 +20,8 @@ return {
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.diagnostics.trouble-nvim" },
   { import = "astrocommunity.file-explorer.oil-nvim" },
+  -- UI/appereance
+  { import = "astrocommunity.colorscheme.catppuccin" },
+  -- AI
+  { import = "astrocommunity.ai.opencode-nvim"}
 }
