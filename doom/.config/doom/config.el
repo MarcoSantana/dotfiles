@@ -151,6 +151,12 @@
   (setq projectile-project-root-files-bottom-up
         (remove ".git" projectile-project-root-files-bottom-up)))
 
+;; Fix posframe/childframe on Wayland (Cosmic Desktop compatibility)
+(setq childframe-border-width 0
+      posframe-border-width 0)
+(after! corfu
+  (setq corfu-popupinfo-delay 0.5))
+
 (after! clojure-mode
   ;; Enable paredit for powerful structural editing
   (add-hook 'clojure-mode-hook #'enable-paredit-mode)
