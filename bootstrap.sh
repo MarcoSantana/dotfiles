@@ -358,7 +358,8 @@ for item in "${DEV[@]}"; do
       ;;
     "stylelint, js-beautify, tidy")
       if command -v npm &>/dev/null; then
-        npm install -g stylelint js-beautify
+        command -v stylelint &>/dev/null || npm install -g stylelint
+        command -v js-beautify &>/dev/null || npm install -g js-beautify
       else
         warn "npm not found — install stylelint/js-beautify/tidy manually"
       fi
