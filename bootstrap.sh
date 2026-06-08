@@ -246,8 +246,9 @@ install_apt "${APT_DEV[@]}"
 install_deb() {
   local name=$1 url=$2
   command -v "$name" &>/dev/null && { ok "$name already installed"; return; }
-  local tmp; tmp=$(mktemp -d)
-  curl -fsSL "$url" -o "$tmp/pkg.deb" && sudo dpkg -i "$tmp/pkg.deb" || warn "Failed: $name (see above)"
+  local tmp; tmp=$(mktemp -d); local rc=0
+  curl -fsSL "$url" -o "$tmp/pkg.deb" && sudo dpkg -i "$tmp/pkg.deb" || rc=1
+  if [[ $rc -ne 0 ]]; then warn "Failed: $name"; fi
   rm -rf "$tmp"
 }
 
@@ -310,7 +311,6 @@ for item in "${EDITORS[@]}"; do
       ;;
     "emacs (doom)")
       if ! command -v emacs &>/dev/null || [[ ! -d "$HOME/.emacs.d" ]]; then
-        APT_EMACS=()
         install_apt emacs
         if [[ ! -d "$HOME/.emacs.d" ]]; then
           spinner "Installing Doom Emacs..." \

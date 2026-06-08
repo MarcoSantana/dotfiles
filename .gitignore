@@ -23,6 +23,9 @@ Local\ Storage/
 # Stow artifacts
 .stow-*
 
+# Nix
+/result
+
 # Emacs specific
 emacs/.config/emacs/
 eln-cache/
