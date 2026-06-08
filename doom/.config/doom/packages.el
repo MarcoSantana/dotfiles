@@ -65,3 +65,4 @@
 (package! nano-theme)
 (package! nano-modeline)
 (package! paredit)
+(package! ox-pandoc)

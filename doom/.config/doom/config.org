@@ -186,7 +186,68 @@ Using =typst-lsp= for completions and =typst-preview= for immediate visual feedb
   (setq typst-preview-args '("--listen" "127.0.0.1:9876")))
 #+end_src
 
+* Super Duper Writing Engine
+A unified PDF export pipeline. One keybind, every format, bulletproof.
+
+- *Typst* → ~typst compile~ (native, fast)
+- *Markdown* → Pandoc + ~--pdf-engine=typst~ (no LaTeX needed)
+- *Org* → ~ox-pandoc~ + Pandoc + ~--pdf-engine=typst~
+
+** Exports
+| Keybinding | Action                             |
+|------------+------------------------------------|
+| ~SPC e p~  | Export current buffer to PDF       |
+| ~SPC e t~  | Toggle Typst auto-compile on save  |
+
+#+begin_src elisp
+(defun +export-to-pdf ()
+  "Export current buffer to PDF using format-appropriate pipeline."
+  (interactive)
+  (cond
+   ((eq major-mode 'typst-ts-mode) (typst-ts-mode-compile))
+   ((eq major-mode 'markdown-mode)  (+md-to-pdf))
+   ((eq major-mode 'org-mode)       (+org-to-pdf))
+   (t (user-error "No PDF export for %s" major-mode))))
+
+(defun +md-to-pdf ()
+  "Markdown → PDF via pandoc + typst engine."
+  (interactive)
+  (let ((infile (buffer-file-name)))
+    (unless infile (user-error "Save buffer first"))
+    (compile (format "pandoc '%s' --pdf-engine=typst -o '%s'"
+                     infile (concat (file-name-sans-extension infile) ".pdf"))
+             t)))
+
+(defun +org-to-pdf ()
+  "Org → PDF via ox-pandoc + typst engine."
+  (interactive)
+  (require 'ox-pandoc)
+  (let ((org-pandoc-pdf-engine "typst"))
+    (org-pandoc-export-to-pdf)))
+
+(defvar +typst-auto-compile nil "Auto-compile .typ files on save.")
+
+(defun +typst-auto-compile-toggle ()
+  (interactive)
+  (setq +typst-auto-compile (not +typst-auto-compile))
+  (message "Typst auto-compile: %s" (if +typst-auto-compile "ON" "OFF")))
+
+(defun +typst-compile-on-save ()
+  (when (and (eq major-mode 'typst-ts-mode) +typst-auto-compile
+             (buffer-file-name) (string-suffix-p ".typ" (buffer-file-name)))
+    (typst-ts-mode-compile)))
+
+(add-hook 'after-save-hook #'+typst-compile-on-save)
+
+(map! :leader
+      (:prefix ("e" . "export")
+       :desc "Buffer to PDF"      "p" #'+export-to-pdf
+       :desc "Toggle typst watch" "t" #'+typst-auto-compile-toggle))
+#+end_src
+
 * Custom Packages
+- ~ox-pandoc~ — Org export through Pandoc (required for Org → PDF pipeline)
+  (declared in =packages.el=)
 
 * Clojure IDE
 A comprehensive configuration for Clojure and ClojureScript development.

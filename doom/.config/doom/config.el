@@ -126,6 +126,58 @@
   ;; Automatically pretty-print REPL output
   (setq cider-repl-use-pretty-printing t))
 
+;; ── Super Duper Writing Engine ──────────────────────────────────────
+;; Unified PDF export: one keybind, any format, best pipeline.
+;;   typst   →  typst compile
+;;   markdown →  pandoc + typst engine
+;;   org     →  ox-pandoc + typst engine (no LaTeX needed)
+
+(defun +export-to-pdf ()
+  "Export current buffer to PDF using format-appropriate pipeline."
+  (interactive)
+  (cond
+   ((eq major-mode 'typst-ts-mode) (typst-ts-mode-compile))
+   ((eq major-mode 'markdown-mode)  (+md-to-pdf))
+   ((eq major-mode 'org-mode)       (+org-to-pdf))
+   (t (user-error "No PDF export for %s" major-mode))))
+
+(defun +md-to-pdf ()
+  "Markdown → PDF via pandoc + typst engine."
+  (interactive)
+  (let ((infile (buffer-file-name)))
+    (unless infile (user-error "Save buffer first"))
+    (compile (format "pandoc '%s' --pdf-engine=typst -o '%s'"
+                     infile (concat (file-name-sans-extension infile) ".pdf"))
+             t)))
+
+(defun +org-to-pdf ()
+  "Org → PDF via ox-pandoc + typst engine."
+  (interactive)
+  (require 'ox-pandoc)
+  (let ((org-pandoc-pdf-engine "typst"))
+    (org-pandoc-export-to-pdf)))
+
+;; Typst auto-compile on save (toggle with +typst-auto-compile-toggle)
+(defvar +typst-auto-compile nil "Auto-compile .typ files on save.")
+
+(defun +typst-auto-compile-toggle ()
+  (interactive)
+  (setq +typst-auto-compile (not +typst-auto-compile))
+  (message "Typst auto-compile: %s" (if +typst-auto-compile "ON" "OFF")))
+
+(defun +typst-compile-on-save ()
+  (when (and (eq major-mode 'typst-ts-mode) +typst-auto-compile
+             (buffer-file-name) (string-suffix-p ".typ" (buffer-file-name)))
+    (typst-ts-mode-compile)))
+
+(add-hook 'after-save-hook #'+typst-compile-on-save)
+
+;; Keybindings: SPC e p → PDF export, SPC e t → toggle auto-compile
+(map! :leader
+      (:prefix ("e" . "export")
+       :desc "Buffer to PDF"      "p" #'+export-to-pdf
+       :desc "Toggle typst watch" "t" #'+typst-auto-compile-toggle))
+
 (after! lsp-mode
   ;; Optional: If you want to customize lsp-ui for a cleaner look
   (setq lsp-ui-sideline-show-diagnostics t
