@@ -1,146 +1,410 @@
 #!/usr/bin/env bash
+#
+# bootstrap.sh — Interactive Ubuntu/Debian dotfiles installer
+# Uses gum for a pretty TUI. You choose what goes in.
+#
+set -euo pipefail
 
-set -e
-
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
-
-log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_err() { echo -e "${RED}[ERROR]${NC} $1"; }
-
-# Initialize variables
+DOTFILES="$HOME/dotfiles"
 DRY_RUN=false
-CLEAN=false
-HOST="nixos"
 
-# Parse arguments
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        --dry-run) DRY_RUN=true ;;
-        --clean) CLEAN=true ;;
-        --macbook) HOST="macbook" ;;
-        --lenovo) HOST="lenovoL13" ;;
-        *) log_warn "Unknown argument: $1" ;;
-    esac
-    shift
+# ── Parse args ───────────────────────────────────────────────────────
+while [[ $# -gt 0 ]]; do
+  case $1 in --dry-run) DRY_RUN=true ;; --help|-h)
+    echo "Usage: $0 [--dry-run]"; exit 0 ;;
+  *) echo "Unknown: $1"; exit 1 ;; esac; shift
 done
 
-# 1. Preflight Checks
-log_info "Starting Preflight Checks..."
+run() {
+  if $DRY_RUN; then echo "[DRY-RUN] $*"; else "$@"; fi
+}
 
-# Check if running on NixOS
-ON_NIXOS=false
-if [ -f /etc/NIXOS ]; then
-    ON_NIXOS=true
+# ── Bootstrap gum itself (needed for the whole TUI) ──────────────────
+if ! command -v gum &>/dev/null; then
+  echo "Installing gum for the pretty TUI..."
+  mkdir -p /tmp/gum
+  curl -fsSL https://github.com/charmbracelet/gum/releases/latest/download/gum_amd64.deb \
+    -o /tmp/gum/gum.deb
+  sudo dpkg -i /tmp/gum/gum.deb &>/dev/null
+  rm -rf /tmp/gum
 fi
 
-if [ "$ON_NIXOS" = false ] && [ "$DRY_RUN" = false ]; then
-    log_err "This script is designed for NixOS. Use on other systems at your own risk."
-    exit 1
+# ── Gum helpers ──────────────────────────────────────────────────────
+header()    { gum style --border thick --padding "1 2" --margin "0 0 1 0" "$1"; }
+subheader() { gum style --padding "0 1" --foreground 212 "$1"; }
+ok()        { gum style --foreground 42 "$1"; }
+warn()      { gum style --foreground 220 "$1"; }
+fail()      { gum style --foreground 196 "$1"; exit 1; }
+prompt()    { gum input --placeholder "$1" --value "${2:-}" --width 60; }
+confirm()   { gum confirm --affirmative "Yes" --negative "No" "$1"; }
+spinner()   { gum spin --spinner dot --title "$1" -- "$2"; }
+
+# ── Preflight ────────────────────────────────────────────────────────
+header "Preflight"
+
+if [[ ! -f /etc/os-release ]]; then
+  fail "Cannot detect OS. This script targets Debian/Ubuntu."
 fi
-
-# Failsafe: Detect EFI mount point
-BOOT_MOUNT=$(findmnt -n -o TARGET /boot 2>/dev/null || echo "")
-BOOT_EFI_MOUNT=$(findmnt -n -o TARGET /boot/efi 2>/dev/null || echo "")
-
-EFI_PATH=""
-if [ -n "$BOOT_EFI_MOUNT" ]; then
-    EFI_PATH="/boot/efi"
-elif [ -n "$BOOT_MOUNT" ]; then
-    # Check if /boot is actually the EFI partition (vfat)
-    if findmnt -n -o FSTYPE /boot | grep -q "vfat"; then
-        EFI_PATH="/boot"
-    fi
-fi
-
-if [ -n "$EFI_PATH" ]; then
-    log_info "Detected EFI partition at: $EFI_PATH"
+. /etc/os-release
+if [[ "$ID" =~ ^(ubuntu|debian|pop|linuxmint|elementary)$ ]]; then
+  ok "Detected: $ID $VERSION_ID ($VERSION_CODENAME)"
 else
-    log_warn "Could not automatically detect EFI partition. Ensuring /boot/efi or /boot is mounted is recommended."
+  warn "Untested distro: $ID (proceed at your own risk)"
+  confirm "Continue?" || exit 1
 fi
 
-# Check Disk space (require at least 5GB)
-if command -v df >/dev/null 2>&1; then
-    FREE_SPACE=$(df / --output=avail -k | tail -1 | xargs)
-    # 5GB = 5242880 KB
-    if [ "$FREE_SPACE" -lt 5242880 ]; then
-        log_warn "Low disk space detected (less than 5GB). Cleanup is highly recommended."
-    fi
+if [[ ! -d "$DOTFILES/.git" ]]; then
+  fail "No git repo at $DOTFILES — clone your dotfiles first."
+fi
+ok "Dotfiles repo: $DOTFILES"
+
+# ── Welcome ──────────────────────────────────────────────────────────
+gum style \
+  --border double --border-foreground 212 \
+  --padding "1 3" --margin "1 0" \
+  "  .--.  v2  Ubuntu/Debian Bootstrap
+ /     \  Pick what you need —
+ \ .-. /  skip the rest.
+  \_/_/   " | gum format -t emoji
+
+confirm "Start the bootstrap?" || exit 1
+
+# ── Category selections ──────────────────────────────────────────────
+choose() {
+  gum choose --no-limit --header "$1" --cursor "➜ " --selected-prefix "✓ " --unselected-prefix "• " "${@:2}"
+}
+
+header "Select what to install"
+
+# --- Category: Core System ---
+subheader "Core System"
+CORE=$(choose "Essentials (always recommended)" \
+  "curl,wget,git" \
+  "build-essential" \
+  "stow" \
+  "unzip,xclip" \
+  "fonts-firacode,fonts-noto-color-emoji")
+
+# --- Category: Shell & Terminal ---
+subheader "Shell & Terminal"
+SHELL_ITEMS=$(choose "Shell tools" \
+  "zsh" \
+  "tmux" \
+  "fzf" \
+  "fd-find,ripgrep" \
+  "eza (modern ls)" \
+  "bat (modern cat)" \
+  "jq" \
+  "starship prompt" \
+  "zoxide (smarter cd)" \
+  "fastfetch" \
+  "oh-my-zsh" \
+  "kitty terminal")
+
+# --- Category: Editors ---
+subheader "Editors"
+EDITORS=$(choose "Pick your weapons" \
+  "neovim" \
+  "helix" \
+  "zed" \
+  "emacs (doom)" \
+  "vim")
+
+# --- Category: Desktop / WM ---
+subheader "Desktop / Window Manager"
+DESKTOP=$(choose "Desktop components" \
+  "i3 window manager" \
+  "rofi launcher" \
+  "eww widgets" \
+  "waybar" \
+  "hyprland")
+
+# --- Category: Development ---
+subheader "Development"
+DEV=$(choose "Dev tooling" \
+  "nvm (node version manager)" \
+  "mise (runtime version manager)" \
+  "podman + podman-docker" \
+  "docker.io")
+
+# --- Category: Dotfiles (Stow) ---
+header "Dotfiles (Stow packages)"
+
+AVAILABLE_STOW=()
+for d in "$DOTFILES"/*/; do
+  name=$(basename "$d")
+  [[ "$name" == .git || "$name" == nixos || "$name" == assets ]] && continue
+  AVAILABLE_STOW+=("$name")
+done
+
+STOW_SELECTED=()
+while IFS= read -r line; do
+  STOW_SELECTED+=("$line")
+done < <(
+  gum choose --no-limit \
+    --header "Which configs to stow? (↑↓ navigate, space toggle, enter confirm)" \
+    --cursor "➜ " \
+    --selected-prefix "✓ " \
+    --unselected-prefix "• " \
+    "${AVAILABLE_STOW[@]}"
+)
+
+if [[ ${#STOW_SELECTED[@]} -eq 0 ]]; then
+  warn "No stow packages selected — skipping dotfiles deployment."
 fi
 
-# 2. Cleanup & Repair
-if [ "$CLEAN" = true ]; then
-    log_info "Performing Nix Store cleanup..."
-    if [ "$DRY_RUN" = true ]; then
-        log_info "[DRY-RUN] sudo nix-collect-garbage -d"
-    else
-        sudo nix-collect-garbage -d
-    fi
-    
-    log_info "Verifying Nix Store integrity..."
-    if [ "$DRY_RUN" = true ]; then
-        log_info "[DRY-RUN] sudo nix-store --verify --check-contents"
-    else
-        sudo nix-store --verify --check-contents
-    fi
-fi
+# ── Confirmation ─────────────────────────────────────────────────────
+header "Summary"
+echo
+gum style --foreground 212 "Core:    $(IFS=,; echo "${CORE[*]}" | tr '\n' ' ')"
+gum style --foreground 212 "Shell:   $(IFS=,; echo "${SHELL_ITEMS[*]}" | tr '\n' ' ')"
+gum style --foreground 212 "Editors: $(IFS=,; echo "${EDITORS[*]}" | tr '\n' ' ')"
+gum style --foreground 212 "Desktop: $(IFS=,; echo "${DESKTOP[*]}" | tr '\n' ' ')"
+gum style --foreground 212 "Dev:     $(IFS=,; echo "${DEV[*]}" | tr '\n' ' ')"
+gum style --foreground 212 "Stow:    ${STOW_SELECTED[*]}"
+echo
+confirm "Proceed with install?" || exit 1
 
-# 3. Handle Host-Specific Logic
-log_info "Target Host: $HOST"
+# ── Helper: item in list ─────────────────────────────────────────────
+has()  { printf '%s\n' "$2" | grep -qxF "$1"; }
+has_any() {
+  local needle; for needle in $1; do
+    printf '%s\n' "$2" | grep -qxF "$needle" && return 0
+  done; return 1
+}
 
-# 4. Ensure hardware config exists for the target host
-HW_PATH="./nixos/$HOST/hardware-configuration.nix"
-log_info "Checking hardware configuration for $HOST..."
+# ── APT Install ──────────────────────────────────────────────────────
+install_apt() {
+  local pkgs=()
+  for p in "$@"; do pkgs+=("$p"); done
+  if [[ ${#pkgs[@]} -gt 0 ]]; then
+    export DEBIAN_FRONTEND=noninteractive
+    spinner "Installing APT packages..." \
+      "sudo apt-get install -y -qq ${pkgs[*]}"
+  fi
+}
 
-if [ ! -f /etc/nixos/hardware-configuration.nix ]; then
-    log_warn "Hardware configuration not found in /etc/nixos/."
-    if [ "$DRY_RUN" = false ]; then
-        log_info "Generating..."
-        sudo nixos-generate-config --show-hardware-config > "$HW_PATH"
-    fi
-else
-    log_info "Copying hardware configuration from /etc/nixos/ to $HW_PATH..."
-    if [ "$DRY_RUN" = true ]; then
-        log_info "[DRY-RUN] cp /etc/nixos/hardware-configuration.nix $HW_PATH"
-    else
-        cp /etc/nixos/hardware-configuration.nix "$HW_PATH"
-    fi
-fi
+header "Installation"
 
-# Failsafe: Cross-check EFI path with configuration
-if [ -n "$EFI_PATH" ]; then
-    CONFIG_PATH="./nixos/$HOST/configuration.nix"
-    if [ -f "$CONFIG_PATH" ]; then
-        CONFIG_EFI=$(grep -v "^\s*#" "$CONFIG_PATH" | grep "efiSysMountPoint" | cut -d'"' -f2 || echo "")
-        if [ -n "$CONFIG_EFI" ] && [ "$CONFIG_EFI" != "$EFI_PATH" ]; then
-            log_err "Failsafe Triggered: Configuration expects EFI at '$CONFIG_EFI' but it's mounted at '$EFI_PATH'!"
-            log_err "Please update 'boot.loader.efi.efiSysMountPoint' in $CONFIG_PATH to match."
-            if [ "$DRY_RUN" = false ]; then
-                exit 1
-            fi
+# Update once
+export DEBIAN_FRONTEND=noninteractive
+spinner "Updating package lists..." "sudo apt-get update -qq"
+
+# --- Core ---
+APT_CORE=()
+for item in "${CORE[@]}"; do
+  case $item in
+    "curl,wget,git")        APT_CORE+=(curl wget git) ;;
+    "build-essential")      APT_CORE+=(build-essential) ;;
+    "stow")                 APT_CORE+=(stow) ;;
+    "unzip,xclip")          APT_CORE+=(unzip xclip) ;;
+    "fonts-firacode,fonts-noto-color-emoji")
+      APT_CORE+=(fonts-firacode fonts-noto-color-emoji) ;;
+  esac
+done
+install_apt "${APT_CORE[@]}"
+
+# --- Shell & Terminal ---
+APT_SHELL=()
+for item in "${SHELL_ITEMS[@]}"; do
+  case $item in
+    "zsh")                    APT_SHELL+=(zsh) ;;
+    "tmux")                   APT_SHELL+=(tmux) ;;
+    "fzf")                    APT_SHELL+=(fzf) ;;
+    "fd-find,ripgrep")        APT_SHELL+=(fd-find ripgrep) ;;
+    "jq")                     APT_SHELL+=(jq) ;;
+    "kitty terminal")         APT_SHELL+=(kitty) ;;
+  esac
+done
+install_apt "${APT_SHELL[@]}"
+
+# --- Editors (APT) ---
+APT_EDIT=()
+for item in "${EDITORS[@]}"; do
+  case $item in
+    "neovim")  APT_EDIT+=(neovim) ;;
+    "vim")     APT_EDIT+=(vim) ;;
+    "helix")   APT_EDIT+=(helix) ;;
+  esac
+done
+install_apt "${APT_EDIT[@]}"
+
+# --- Desktop (APT) ---
+APT_DESKTOP=()
+for item in "${DESKTOP[@]}"; do
+  case $item in
+    "i3 window manager")  APT_DESKTOP+=(i3 i3blocks) ;;
+    "rofi launcher")      APT_DESKTOP+=(rofi) ;;
+    "waybar")             APT_DESKTOP+=(waybar) ;;
+  esac
+done
+install_apt "${APT_DESKTOP[@]}"
+
+# --- Dev (APT) ---
+APT_DEV=()
+for item in "${DEV[@]}"; do
+  case $item in
+    "podman + podman-docker") APT_DEV+=(podman podman-docker) ;;
+    "docker.io")               APT_DEV+=(docker.io) ;;
+  esac
+done
+install_apt "${APT_DEV[@]}"
+
+# ── Modern CLI Tools (non-APT) ───────────────────────────────────────
+install_deb() {
+  local name=$1 url=$2
+  command -v "$name" &>/dev/null && { ok "$name already installed"; return; }
+  local tmp; tmp=$(mktemp -d)
+  (curl -fsSOL "$url" -o "$tmp/pkg.deb" && sudo dpkg -i "$tmp/pkg.deb") &>/dev/null || true
+  rm -rf "$tmp"
+}
+
+for item in "${SHELL_ITEMS[@]}"; do
+  case $item in
+    "eza (modern ls)")
+      install_deb "eza" \
+        "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.deb"
+      ;;
+    "bat (modern cat)")
+      install_deb "bat" \
+        "https://github.com/sharkdp/bat/releases/latest/download/bat-musl_amd64.deb"
+      ;;
+    "starship prompt")
+      if ! command -v starship &>/dev/null; then
+        spinner "Installing starship..." \
+          "curl -fsSL https://starship.rs/install.sh | sh -s -- -y"
+      fi
+      ;;
+    "zoxide (smarter cd)")
+      if ! command -v zoxide &>/dev/null; then
+        spinner "Installing zoxide..." \
+          "curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash"
+      fi
+      ;;
+    "fastfetch")
+      install_deb "fastfetch" \
+        "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb"
+      ;;
+    "oh-my-zsh")
+      if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+        spinner "Installing Oh My Zsh..." \
+          "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" \"\" --unattended"
+      fi
+      ;;
+  esac
+done
+
+# --- Editors (non-APT) ---
+for item in "${EDITORS[@]}"; do
+  case $item in
+    "helix")
+      if ! command -v hx &>/dev/null; then
+        spinner "Installing Helix editor..." '
+          tmp=$(mktemp -d)
+          curl -fsSL https://github.com/helix-editor/helix/releases/latest/download/helix-x86_64-linux.tar.xz \
+            | tar xJ -C "$tmp"
+          sudo cp "$tmp/helix-x86_64-linux/hx" /usr/local/bin/
+          sudo mkdir -p /usr/local/lib/helix
+          sudo cp -r "$tmp/helix-x86_64-linux/runtime" /usr/local/lib/helix/
+          rm -rf "$tmp"
+        '
+      fi
+      ;;
+    "zed")
+      if ! command -v zed &>/dev/null; then
+        spinner "Installing Zed editor..." \
+          "curl -fsSL https://zed.dev/install.sh | bash"
+      fi
+      ;;
+    "emacs (doom)")
+      if ! command -v emacs &>/dev/null || [[ ! -d "$HOME/.emacs.d" ]]; then
+        APT_EMACS=()
+        install_apt emacs
+        if [[ ! -d "$HOME/.emacs.d" ]]; then
+          spinner "Installing Doom Emacs..." \
+            "git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.emacs.d"
+          ~/.emacs.d/bin/doom install --no-config --no-env 2>/dev/null || true
         fi
-    fi
+      fi
+      ;;
+  esac
+done
+
+# --- Dev (non-APT) ---
+for item in "${DEV[@]}"; do
+  case $item in
+    "nvm (node version manager)")
+      if [[ ! -d "$HOME/.nvm" ]]; then
+        spinner "Installing nvm..." \
+          "curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
+      fi
+      ;;
+    "mise (runtime version manager)")
+      if ! command -v mise &>/dev/null; then
+        spinner "Installing mise..." \
+          "curl -fsSL https://mise.run | bash"
+      fi
+      ;;
+  esac
+done
+
+# --- Desktop (non-APT) ---
+for item in "${DESKTOP[@]}"; do
+  case $item in
+    "hyprland")
+      # Hyprland on Ubuntu/Debian is easiest via a community PPA
+      if ! command -v Hyprland &>/dev/null; then
+        install_apt hyprland
+      fi
+      ;;
+    "eww widgets")
+      if ! command -v eww &>/dev/null; then
+        warn "eww requires Rust — install manually or via cargo: cargo install eww"
+      fi
+      ;;
+  esac
+done
+
+# ── Stow ─────────────────────────────────────────────────────────────
+header "Deploying Dotfiles"
+
+for pkg in "${STOW_SELECTED[@]}"; do
+  pkg_path="$DOTFILES/$pkg"
+  if [[ -d "$pkg_path" ]]; then
+    spinner "Stowing $pkg..." "cd '$DOTFILES' && stow -R '$pkg'"
+    ok "  ✓ $pkg"
+  else
+    warn "  ✗ $pkg — directory not found"
+  fi
+done
+
+# Top-level files (bashrc, bash_profile, gitconfig, vimrc, kakrc)
+for f in bashrc bash_profile gitconfig vimrc kakrc; do
+  if [[ -f "$DOTFILES/$f" && ! -L "$HOME/.$f" ]]; then
+    run ln -sf "$DOTFILES/$f" "$HOME/.$f"
+    ok "  ✓ .$f"
+  fi
+done
+
+# ── Post-install tweaks ──────────────────────────────────────────────
+header "Post-Install"
+
+# Caps Lock → Ctrl (GNOME)
+if command -v gsettings &>/dev/null && confirm "Map Caps Lock to Ctrl?"; then
+  gsettings set org.gnome.desktop.input-sources xkb-options "['ctrl:nocaps']" 2>/dev/null && ok "  ✓ Caps Lock → Ctrl"
 fi
 
-# 5. Rebuild system using the flake
-log_info "Building system from flake for $HOST..."
-
-if [ "$DRY_RUN" = true ]; then
-    log_info "Running dry-run build..."
-    nix build ".#nixosConfigurations.$HOST.config.system.build.toplevel" --dry-run --show-trace --verbose
-else
-    # Failsafe wrap for the rebuild
-    if ! sudo nixos-rebuild switch --flake ".#$HOST"; then
-        log_err "Rebuild failed! If this was a bootloader error, check your EFI mount point and hardware-configuration.nix."
-        exit 1
-    fi
+# Podman socket
+if command -v podman &>/dev/null && confirm "Enable podman rootless socket?"; then
+  systemctl --user enable --now podman.socket 2>/dev/null && ok "  ✓ podman socket"
 fi
 
-log_info "Bootstrap process completed!"
-if [ "$DRY_RUN" = false ]; then
-    log_info "Reboot recommended if this is a fresh install."
+# Default shell → zsh
+if command -v zsh &>/dev/null && [[ "$SHELL" != "$(command -v zsh)" ]] && confirm "Change default shell to zsh?"; then
+  chsh -s "$(command -v zsh)" && ok "  ✓ default shell → zsh"
 fi
+
+# ── Done ─────────────────────────────────────────────────────────────
+header "Done"
+gum style --foreground 42 --padding "0 2" \
+  "Bootstrap complete! Restart your shell: exec \$SHELL"

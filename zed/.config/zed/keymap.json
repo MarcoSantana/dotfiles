@@ -1,0 +1,10 @@
+[
+  {
+    "context": "Editor && vim_mode == true",
+    "bindings": {
+      "space space": "file_finder::Toggle",
+      "space /": "search::ToggleRegex",
+      "space w": "pane::RevealInProjectPanel"
+    }
+  }
+]

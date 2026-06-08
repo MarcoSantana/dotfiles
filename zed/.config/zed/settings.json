@@ -1,0 +1,22 @@
+{
+  "autosave": "on_focus_change",
+  "base_keymap": "VSCode",
+  "vim_mode": true,
+  "theme": "catppuccin-mocha",
+  "ui_font_size": 14,
+  "buffer_font_size": 13,
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "terminal": {
+    "font_size": 12,
+    "blinking": "off"
+  },
+  "cursor_blink": "off",
+  "soft_wrap": "editor_width",
+  "preferred_line_length": 100,
+  "scrollbar": {
+    "show": "never"
+  }
+}

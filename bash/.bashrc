@@ -145,3 +145,12 @@ eval "$(starship init bash)"
 export PATH="$HOME/.local/bin:$PATH"
 source ~/.fzf.bash
 alias tmux="tmux -f ~/.config/tmux/tmux.conf"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/msantana/.lmstudio/bin"
+# End of LM Studio CLI section
+
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/msantana/.local/bin:$PATH"
