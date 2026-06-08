@@ -56,7 +56,7 @@
 (package! typst-preview
   :recipe (:host github :repo "havarddj/typst-preview.el"))
 (package! typst-ts-mode
-  :recipe (:host github :repo "Meow-Twice/typst-ts-mode"))
+  :recipe (:host sourcehut :repo "meow_king/typst-ts-mode" :files ("*.el")))
 
 (package! org-modern)
 (package! mixed-pitch)

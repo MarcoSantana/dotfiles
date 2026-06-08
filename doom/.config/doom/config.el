@@ -103,35 +103,6 @@
   (setq typst-preview-browser "firefox") ; or "google-chrome", "chromium", etc.
   (setq typst-preview-args '("--listen" "127.0.0.1:9876")))
 
-(after! clojure-mode
-  ;; Enable paredit for powerful structural editing
-  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
-
-  ;; Keybindings for common actions
-  (map! :map clojure-mode-map
-        :localleader
-        :desc "Format buffer" "f" #'+format/buffer
-        :desc "Jack-in" "j" #'cider-jack-in
-        :desc "Connect to REPL" "c" #'cider-connect
-        :desc "Load current file" "l" #'cider-load-file
-        :desc "Run tests" "t" #'cider-test-run-ns-tests))
-
-(after! cider
-  ;; Display function signatures and documentation in the minibuffer
-  (setq cider-use-eldoc-for-symbol-completion t)
-  
-  ;; When a warning is reported, open a buffer with the details
-  (setq cider-show-error-buffer-on-warning t)
-  
-  ;; Automatically pretty-print REPL output
-  (setq cider-repl-use-pretty-printing t))
-
-;; ── Super Duper Writing Engine ──────────────────────────────────────
-;; Unified PDF export: one keybind, any format, best pipeline.
-;;   typst   →  typst compile
-;;   markdown →  pandoc + typst engine
-;;   org     →  ox-pandoc + typst engine (no LaTeX needed)
-
 (defun +export-to-pdf ()
   "Export current buffer to PDF using format-appropriate pipeline."
   (interactive)
@@ -157,7 +128,6 @@
   (let ((org-pandoc-pdf-engine "typst"))
     (org-pandoc-export-to-pdf)))
 
-;; Typst auto-compile on save (toggle with +typst-auto-compile-toggle)
 (defvar +typst-auto-compile nil "Auto-compile .typ files on save.")
 
 (defun +typst-auto-compile-toggle ()
@@ -172,11 +142,37 @@
 
 (add-hook 'after-save-hook #'+typst-compile-on-save)
 
-;; Keybindings: SPC e p → PDF export, SPC e t → toggle auto-compile
 (map! :leader
       (:prefix ("e" . "export")
        :desc "Buffer to PDF"      "p" #'+export-to-pdf
        :desc "Toggle typst watch" "t" #'+typst-auto-compile-toggle))
+
+(after! projectile
+  (setq projectile-project-root-files-bottom-up
+        (remove ".git" projectile-project-root-files-bottom-up)))
+
+(after! clojure-mode
+  ;; Enable paredit for powerful structural editing
+  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
+
+  ;; Keybindings for common actions
+  (map! :map clojure-mode-map
+        :localleader
+        :desc "Format buffer" "f" #'+format/buffer
+        :desc "Jack-in" "j" #'cider-jack-in
+        :desc "Connect to REPL" "c" #'cider-connect
+        :desc "Load current file" "l" #'cider-load-file
+        :desc "Run tests" "t" #'cider-test-run-ns-tests))
+
+(after! cider
+  ;; Display function signatures and documentation in the minibuffer
+  (setq cider-use-eldoc-for-symbol-completion t)
+  
+  ;; When a warning is reported, open a buffer with the details
+  (setq cider-show-error-buffer-on-warning t)
+  
+  ;; Automatically pretty-print REPL output
+  (setq cider-repl-use-pretty-printing t))
 
 (after! lsp-mode
   ;; Optional: If you want to customize lsp-ui for a cleaner look

@@ -177,7 +177,7 @@
        ;;solidity          ; do you need a blockchain? No.
        ;;swift             ; who asked for emoji variables?
        ;;terra             ; Earth and Moon in alignment for performance.
-       typst             ; a modern markup-based typesetting system
+        (typst +lsp)      ; a modern markup-based typesetting system
        (web +lsp +tree-sitter)               ; the tubes
        ;;yaml              ; JSON, but readable
        ;;zig               ; C, but simpler

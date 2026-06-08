@@ -245,6 +245,16 @@ A unified PDF export pipeline. One keybind, every format, bulletproof.
        :desc "Toggle typst watch" "t" #'+typst-auto-compile-toggle))
 #+end_src
 
+* Projectile Fix
+Prevent =$HOME= from being detected as a project root (caused by =package.json=
+in home directory).
+
+#+begin_src elisp
+(after! projectile
+  (setq projectile-project-root-files-bottom-up
+        (remove ".git" projectile-project-root-files-bottom-up)))
+#+end_src
+
 * Custom Packages
 - ~ox-pandoc~ — Org export through Pandoc (required for Org → PDF pipeline)
   (declared in =packages.el=)
