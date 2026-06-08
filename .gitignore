@@ -20,6 +20,9 @@ GPUCache/
 Session\ Storage/
 Local\ Storage/
 
+# Stow artifacts
+.stow-*
+
 # Emacs specific
 emacs/.config/emacs/
 eln-cache/
