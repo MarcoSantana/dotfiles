@@ -83,7 +83,8 @@ CORE=$(choose "Essentials (always recommended)" \
   "build-essential" \
   "stow" \
   "unzip,xclip" \
-  "fira-code,fonts-noto-color-emoji")
+  "fira-code,fonts-noto-color-emoji" \
+  "fonts-symbola")
 
 # --- Category: Shell & Terminal ---
 subheader "Shell & Terminal"
@@ -99,7 +100,8 @@ SHELL_ITEMS=$(choose "Shell tools" \
   "zoxide (smarter cd)" \
   "fastfetch" \
   "oh-my-zsh" \
-  "kitty terminal")
+  "kitty terminal" \
+  "grip (markdown preview)")
 
 # --- Category: Editors ---
 subheader "Editors"
@@ -117,7 +119,8 @@ DESKTOP=$(choose "Desktop components" \
   "rofi launcher" \
   "eww widgets" \
   "waybar" \
-  "hyprland")
+  "hyprland" \
+  "screenshot tools (maim, scrot, grim, slurp)")
 
 # --- Category: Development ---
 subheader "Development"
@@ -125,7 +128,8 @@ DEV=$(choose "Dev tooling" \
   "nvm (node version manager)" \
   "mise (runtime version manager)" \
   "podman + podman-docker" \
-  "docker.io")
+  "docker.io" \
+  "clojure tools (clj-kondo, cljfmt)")
 
 # --- Category: Dotfiles (Stow) ---
 header "Dotfiles (Stow packages)"
@@ -192,6 +196,8 @@ for item in "${CORE[@]}"; do
     "unzip,xclip")          APT_CORE+=(unzip xclip) ;;
     "fira-code,fonts-noto-color-emoji")
       APT_CORE+=(fonts-fira-code fonts-noto-color-emoji) ;;
+    "fonts-symbola")
+      APT_CORE+=(fonts-symbola) ;;
   esac
 done
 install_apt "${APT_CORE[@]}"
@@ -228,6 +234,8 @@ for item in "${DESKTOP[@]}"; do
     "i3 window manager")  APT_DESKTOP+=(i3 i3blocks) ;;
     "rofi launcher")      APT_DESKTOP+=(rofi) ;;
     "waybar")             APT_DESKTOP+=(waybar) ;;
+    "screenshot tools (maim, scrot, grim, slurp)")
+      APT_DESKTOP+=(maim scrot grim slurp) ;;
   esac
 done
 install_apt "${APT_DESKTOP[@]}"
@@ -277,6 +285,11 @@ for item in "${SHELL_ITEMS[@]}"; do
     "fastfetch")
       install_deb "fastfetch" \
         "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb"
+      ;;
+    "grip (markdown preview)")
+      if ! command -v grip &>/dev/null; then
+        pip install --user --break-system-packages grip
+      fi
       ;;
     "oh-my-zsh")
       if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
@@ -329,6 +342,14 @@ for item in "${DEV[@]}"; do
       if [[ ! -d "$HOME/.nvm" ]]; then
         spinner "Installing nvm..." \
           "curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
+      fi
+      ;;
+    "clojure tools (clj-kondo, cljfmt)")
+      if ! command -v clj-kondo &>/dev/null; then
+        curl -fsSL https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/script/install-clj-kondo | bash -s -- --dir ~/.local/bin
+      fi
+      if ! command -v cljfmt &>/dev/null; then
+        warn "cljfmt requires Leiningen or Clojure CLI — install manually: lein upgrade or 'clojure -Sdeps ...'"
       fi
       ;;
     "mise (runtime version manager)")
