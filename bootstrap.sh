@@ -101,7 +101,8 @@ SHELL_ITEMS=$(choose "Shell tools" \
   "fastfetch" \
   "oh-my-zsh" \
   "kitty terminal" \
-  "grip (markdown preview)")
+  "grip (markdown preview)" \
+  "shellcheck,shfmt")
 
 # --- Category: Editors ---
 subheader "Editors"
@@ -129,7 +130,8 @@ DEV=$(choose "Dev tooling" \
   "mise (runtime version manager)" \
   "podman + podman-docker" \
   "docker.io" \
-  "clojure tools (clj-kondo, cljfmt)")
+  "clojure tools (clj-kondo, cljfmt)" \
+  "stylelint, js-beautify, tidy")
 
 # --- Category: Dotfiles (Stow) ---
 header "Dotfiles (Stow packages)"
@@ -212,6 +214,7 @@ for item in "${SHELL_ITEMS[@]}"; do
     "fd-find,ripgrep")        APT_SHELL+=(fd-find ripgrep) ;;
     "jq")                     APT_SHELL+=(jq) ;;
     "kitty terminal")         APT_SHELL+=(kitty) ;;
+    "shellcheck,shfmt")       APT_SHELL+=(shellcheck shfmt) ;;
   esac
 done
 install_apt "${APT_SHELL[@]}"
@@ -246,6 +249,7 @@ for item in "${DEV[@]}"; do
   case $item in
     "podman + podman-docker") APT_DEV+=(podman podman-docker) ;;
     "docker.io")               APT_DEV+=(docker.io) ;;
+    "stylelint, js-beautify, tidy")  APT_DEV+=(tidy) ;;
   esac
 done
 install_apt "${APT_DEV[@]}"
@@ -350,6 +354,13 @@ for item in "${DEV[@]}"; do
       fi
       if ! command -v cljfmt &>/dev/null; then
         warn "cljfmt requires Leiningen or Clojure CLI — install manually: lein upgrade or 'clojure -Sdeps ...'"
+      fi
+      ;;
+    "stylelint, js-beautify, tidy")
+      if command -v npm &>/dev/null; then
+        npm install -g stylelint js-beautify
+      else
+        warn "npm not found — install stylelint/js-beautify/tidy manually"
       fi
       ;;
     "mise (runtime version manager)")
