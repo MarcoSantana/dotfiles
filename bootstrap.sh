@@ -83,7 +83,7 @@ CORE=$(choose "Essentials (always recommended)" \
   "build-essential" \
   "stow" \
   "unzip,xclip" \
-  "fonts-firacode,fonts-noto-color-emoji")
+  "fira-code,fonts-noto-color-emoji")
 
 # --- Category: Shell & Terminal ---
 subheader "Shell & Terminal"
@@ -165,14 +165,6 @@ gum style --foreground 212 "Stow:    ${STOW_SELECTED[*]}"
 echo
 confirm "Proceed with install?" || exit 1
 
-# ── Helper: item in list ─────────────────────────────────────────────
-has()  { printf '%s\n' "$2" | grep -qxF "$1"; }
-has_any() {
-  local needle; for needle in $1; do
-    printf '%s\n' "$2" | grep -qxF "$needle" && return 0
-  done; return 1
-}
-
 # ── APT Install ──────────────────────────────────────────────────────
 install_apt() {
   local pkgs=()
@@ -198,8 +190,8 @@ for item in "${CORE[@]}"; do
     "build-essential")      APT_CORE+=(build-essential) ;;
     "stow")                 APT_CORE+=(stow) ;;
     "unzip,xclip")          APT_CORE+=(unzip xclip) ;;
-    "fonts-firacode,fonts-noto-color-emoji")
-      APT_CORE+=(fonts-firacode fonts-noto-color-emoji) ;;
+    "fira-code,fonts-noto-color-emoji")
+      APT_CORE+=(fonts-fira-code fonts-noto-color-emoji) ;;
   esac
 done
 install_apt "${APT_CORE[@]}"
@@ -255,7 +247,7 @@ install_deb() {
   local name=$1 url=$2
   command -v "$name" &>/dev/null && { ok "$name already installed"; return; }
   local tmp; tmp=$(mktemp -d)
-  (curl -fsSOL "$url" -o "$tmp/pkg.deb" && sudo dpkg -i "$tmp/pkg.deb") &>/dev/null || true
+  curl -fsSL "$url" -o "$tmp/pkg.deb" && sudo dpkg -i "$tmp/pkg.deb" || warn "Failed: $name (see above)"
   rm -rf "$tmp"
 }
 
@@ -300,13 +292,13 @@ for item in "${EDITORS[@]}"; do
     "helix")
       if ! command -v hx &>/dev/null; then
         spinner "Installing Helix editor..." '
-          tmp=$(mktemp -d)
+          tmpdir=$(mktemp -d)
           curl -fsSL https://github.com/helix-editor/helix/releases/latest/download/helix-x86_64-linux.tar.xz \
-            | tar xJ -C "$tmp"
-          sudo cp "$tmp/helix-x86_64-linux/hx" /usr/local/bin/
+            | tar xJ -C "$tmpdir"
+          sudo cp "$tmpdir"/helix-*/hx /usr/local/bin/
           sudo mkdir -p /usr/local/lib/helix
-          sudo cp -r "$tmp/helix-x86_64-linux/runtime" /usr/local/lib/helix/
-          rm -rf "$tmp"
+          sudo cp -r "$tmpdir"/helix-*/runtime /usr/local/lib/helix/
+          rm -rf "$tmpdir"
         '
       fi
       ;;
@@ -352,8 +344,10 @@ done
 for item in "${DESKTOP[@]}"; do
   case $item in
     "hyprland")
-      # Hyprland on Ubuntu/Debian is easiest via a community PPA
       if ! command -v Hyprland &>/dev/null; then
+        if [[ "$ID" == ubuntu ]]; then
+          sudo add-apt-repository -y ppa:hyprland/ppa
+        fi
         install_apt hyprland
       fi
       ;;
