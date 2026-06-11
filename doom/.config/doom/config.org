@@ -300,11 +300,10 @@ A comprehensive configuration for Clojure and ClojureScript development.
         lsp-ui-doc-show-with-cursor t
         lsp-ui-doc-show-with-mouse t
         lsp-ui-doc-include-signature t
-        lsp-ui-sideline-show-code-actions nil)
+        lsp-ui-sideline-show-code-actions nil))
 
-  ;; Bind 'gh' to show documentation (glance)
-  (map! :map lsp-mode-map
-        :nv "gh" #'lsp-ui-doc-glance))
+;; Bind 'gh' to show documentation (glance) - moved outside after! for robustness
+(map! :nv "gh" #'lsp-ui-doc-glance)
 
 ;; To configure formatting, create a `.cljstyle.clj` file in your project's
 ;; root directory. clojure-lsp will automatically pick it up.
