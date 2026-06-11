@@ -626,7 +626,10 @@ before packages are loaded."
 
   ;; LSP completion/documentation defaults
   (setq lsp-enable-snippet t
-        lsp-ui-doc-show-with-cursor t
+        lsp-ui-doc-enable nil            ; Disable childframe popups for tiling WM
+        lsp-ui-sideline-show-hover t     ; Show hover info in the sideline instead
+        lsp-ui-sideline-enable t
+        lsp-ui-doc-show-with-cursor nil
         lsp-ui-doc-include-signature t)
 
   ;; lsp-tailwindcss configuration
