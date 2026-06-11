@@ -67,8 +67,10 @@ This function should only modify configuration layer settings."
      (llm-client :variables
                  llm-client-enable-gptel t
                  llm-client-enable-ellama t
-                 llm-client-gptel-backend 'ollama
-                 llm-client-ollama-model "llama3")
+                 llm-client-gptel-backend 'lmstudio
+                 llm-client-lmstudio-model "gemma-4"
+                 llm-client-lmstudio-url "http://localhost:1234/v1")
+
      (vue :variables
           vue-backend 'lsp
           vue-vls-enabled nil)
