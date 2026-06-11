@@ -35,10 +35,10 @@ Identifying information for GPG and other services.
 I want my editor to look as good as Pop!_OS.
 
 ** Theme & Transparency
-=doom-one= is a classic, but let's make it feel more integrated.
+=doom-tokyo-night= for that modern, vibrant look.
 
 #+begin_src elisp
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-tokyo-night)
 
 ;; Add some subtle transparency if using a compositor (like Pop!_OS's default)
 (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
@@ -169,7 +169,7 @@ Typst files should look as good as your Org files.
 #+end_src
 
 ** LSP and Real-time Preview
-Using =typst-lsp= for completions and =typst-preview= for immediate visual feedback.
+Using =tinymist= for completions and =typst-preview= for immediate visual feedback.
 
 #+begin_src elisp
 (after! typst-ts-mode
@@ -180,6 +180,13 @@ Using =typst-lsp= for completions and =typst-preview= for immediate visual feedb
         :desc "Preview" "p" #'typst-preview
         :desc "Compile" "c" #'typst-ts-mode-compile
         :desc "Watch"   "w" #'typst-ts-mode-watch))
+
+(after! lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst"))
+  ;; Use the built-in lsp-typst client with the absolute path for tinymist
+  (setq lsp-typst-server-command '("/home/msantana/.local/bin/tinymist"))
+  ;; Explicitly enable snippets for tinymist
+  (setq lsp-completion-enable-snippets t))
 
 (after! typst-preview
   (setq typst-preview-browser "firefox") ; or "google-chrome", "chromium", etc.
