@@ -647,8 +647,8 @@ before packages are loaded."
 
   ;; UI Themes
   (if (display-graphic-p)
-      (spacemacs/load-theme 'tokyo-night)
-    (spacemacs/load-theme 'tokyo-night))
+      (spacemacs/load-theme 'gruvbox-dark-hard)
+    (spacemacs/load-theme 'gruvbox-dark-hard))
 
   ;; ROLLBACK NOTE (2026-05-12): If rolling back, remove everything from here to END MARKDOWN ENHANCEMENTS
   ;; Markdown enhancements - START
