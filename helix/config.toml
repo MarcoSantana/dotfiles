@@ -28,11 +28,11 @@ esc = ["collapse_selection", "keep_primary_selection"]
 # Typst Preview (Assuming typst-preview or just opening the pdf)
 "g" = { "p" = ":sh typst compile % && xdg-open %:r.pdf" }
 
-# Extra powerhouse shortcuts
-"C-h" = "select_prev_sibling"
-"C-j" = "shrink_selection"
-"C-k" = "expand_selection"
-"C-l" = "select_next_sibling"
+# File buffer management
+"A-s" = ":write"
+"A-q" = ":buffer-close"
+"A-a" = "%"
+"A-S" = ":write-as"
 
 [keys.insert]
 # Emacs-like insert mode move
