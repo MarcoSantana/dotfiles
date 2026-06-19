@@ -337,7 +337,12 @@ for item in "${EDITORS[@]}"; do
       fi
       ;;
   esac
-done
+    done
+
+# --- Yazi plugins ---
+if command -v ya &>/dev/null; then
+  spinner "Installing yazi plugins..." "ya pkg install"
+fi
 
 # --- Dev (non-APT) ---
 for item in "${DEV[@]}"; do

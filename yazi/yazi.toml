@@ -1,0 +1,15 @@
+[manager]
+cwd_on_quit = true
+mouse = true
+hovered_preview = true
+show_hidden = true
+sync = true
+
+[preview]
+image = true
+image_height = 30
+
+[ui]
+border = "rounded"
+underline = true
+render_image = true

@@ -1,3 +1,54 @@
+# --- Typst ---
+[[language]]
+name = "typst"
+auto-format = true
+language-servers = [ "tinymist" ]
+
+[language-server.tinymist]
+command = "tinymist"
+
+# --- Vue ---
 [[language]]
 name = "vue"
 auto-format = true
+language-servers = [ "vue-language-server", "typescript-language-server" ]
+
+[language-server.vue-language-server]
+command = "vue-language-server"
+args = ["--stdio"]
+config = { typescript = { tsdk = "/home/msantana/.nvm/versions/node/v24.14.0/lib/node_modules/typescript/lib" } }
+
+# --- JavaScript / TypeScript ---
+[[language]]
+name = "javascript"
+auto-format = true
+language-servers = [ "typescript-language-server" ]
+
+[[language]]
+name = "typescript"
+auto-format = true
+language-servers = [ "typescript-language-server" ]
+
+[language-server.typescript-language-server]
+command = "typescript-language-server"
+args = ["--stdio"]
+config = { hostInfo = "helix" }
+
+# --- Clojure / ClojureScript ---
+[[language]]
+name = "clojure"
+auto-format = true
+language-servers = [ "clojure-lsp" ]
+
+[language-server.clojure-lsp]
+command = "clojure-lsp"
+
+# --- SQL / PostgreSQL (Supabase) ---
+[[language]]
+name = "sql"
+auto-format = true
+language-servers = [ "postgres-language-server" ]
+
+[language-server.postgres-language-server]
+command = "postgres-language-server"
+args = ["lsp-proxy"]

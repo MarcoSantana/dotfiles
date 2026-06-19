@@ -1,0 +1,59 @@
+[[manager.prepend_keymap]]
+on = ["l", "<Right>", "enter"]
+run = "open"
+
+[[manager.prepend_keymap]]
+on = "L"
+run = "open dir"
+
+[[manager.prepend_keymap]]
+on = ["h", "<Left>", "backspace"]
+run = "leave"
+
+[[manager.prepend_keymap]]
+on = "o"
+run = "open_with"
+
+[[manager.prepend_keymap]]
+on = "O"
+run = "open_with dir"
+
+[[manager.prepend_keymap]]
+on = "."
+run = "toggle_hidden"
+
+[[manager.prepend_keymap]]
+on = "y"
+run = "copy"
+
+[[manager.prepend_keymap]]
+on = "p"
+run = "paste"
+
+[[manager.prepend_keymap]]
+on = "d"
+run = "remove"
+
+[[manager.prepend_keymap]]
+on = "r"
+run = "rename"
+
+[[manager.prepend_keymap]]
+on = "a"
+run = "create"
+
+[[manager.prepend_keymap]]
+on = "f"
+run = "search"
+
+[[manager.prepend_keymap]]
+on = "/"
+run = "filter"
+
+[[manager.prepend_keymap]]
+on = "q"
+run = "quit"
+
+[[manager.prepend_keymap]]
+on = "Q"
+run = "quit_all"

@@ -1,7 +1,7 @@
 (setq user-full-name "MSantana"
       user-mail-address "msantana@example.com")
 
-(setq doom-theme 'doom-gruvbox)
+(setq doom-theme 'doom-one)
 
 ;; Add some subtle transparency if using a compositor (like Pop!_OS's default)
 (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
@@ -99,13 +99,6 @@
         :desc "Compile" "c" #'typst-ts-mode-compile
         :desc "Watch"   "w" #'typst-ts-mode-watch))
 
-(after! lsp-mode
-  (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst"))
-  ;; Use the built-in lsp-typst client with the absolute path for tinymist
-  (setq lsp-typst-server-command '("/home/msantana/.local/bin/tinymist"))
-  ;; Explicitly enable snippets for tinymist
-  (setq lsp-completion-enable-snippets t))
-
 (after! typst-preview
   (setq typst-preview-browser "firefox") ; or "google-chrome", "chromium", etc.
   (setq typst-preview-args '("--listen" "127.0.0.1:9876")))
@@ -184,16 +177,8 @@
 (after! lsp-mode
   ;; Optional: If you want to customize lsp-ui for a cleaner look
   (setq lsp-ui-sideline-show-diagnostics t
-        lsp-ui-doc-enable t
-        lsp-ui-doc-show-with-cursor t
-        lsp-ui-doc-show-with-mouse t
-        lsp-ui-doc-include-signature t
+        lsp-ui-doc-show-with-mouse nil
         lsp-ui-sideline-show-code-actions nil))
-
-;; Bind 'gh' to show documentation (glance)
-(after! lsp-ui-doc
-  (map! :map lsp-mode-map
-        :nv "gh" #'lsp-ui-doc-glance))
 
 ;; To configure formatting, create a `.cljstyle.clj` file in your project's
 ;; root directory. clojure-lsp will automatically pick it up.

@@ -34,3 +34,4 @@ export PATH="$PATH:/home/msantana/.lmstudio/bin"
 
 # Added by Antigravity CLI installer
 export PATH="/home/msantana/.local/bin:$PATH"
+. "$HOME/.cargo/env"
