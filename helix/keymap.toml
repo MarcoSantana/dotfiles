@@ -5,13 +5,6 @@
 # Space mode keybindings
 "space" = { q = "quit", Q = "force_quit" }
 
-# Alternative: Direct keybindings (if space mode conflicts)
-# "ctrl q" = "quit"
-# "ctrl Q" = "force_quit"
-
-# Additional useful bindings
-"space" = { w = "write", W = "write_all", c = "command_palette" }
-
 [keys.insert]
 # Insert mode bindings
 "ctrl q" = "quit"
