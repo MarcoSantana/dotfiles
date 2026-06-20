@@ -1,0 +1,4 @@
+# Helix configuration
+# Gruvbox theme is set as the default
+
+theme = "gruvbox"
