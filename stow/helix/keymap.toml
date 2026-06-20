@@ -1,15 +1,2 @@
-# Helix Keymap Configuration
-# Custom keybindings for quit and force quit in space mode
 
-[keys.normal]
-# Space mode keybindings
-"space" = { q = "quit", Q = "force_quit" }
 
-[keys.insert]
-# Insert mode bindings
-"ctrl q" = "quit"
-"ctrl Q" = "force_quit"
-
-[keys.select]
-# Select mode bindings
-"space" = { q = "quit", Q = "force_quit" }
