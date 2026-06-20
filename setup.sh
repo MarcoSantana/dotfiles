@@ -13,6 +13,7 @@ mkdir -p ~/.config/helix/themes
 # Copy configuration files
 cp dotfiles/helix/config.toml ~/.config/helix/
 cp dotfiles/helix/languages.toml ~/.config/helix/
+cp dotfiles/helix/keymap.toml ~/.config/helix/
 cp dotfiles/stow/helix/themes/gruvbox.toml ~/.config/helix/themes/
 
 # Verify installation
