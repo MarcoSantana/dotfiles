@@ -4,18 +4,6 @@ local helix_maps = {}
 
 vim.g.helix_mode = false
 
-function _G.toggle_helix_mode()
-  vim.g.helix_mode = not vim.g.helix_mode
-  if vim.g.helix_mode then
-    apply_helix()
-  else
-    remove_helix()
-  end
-  vim.notify("Helix mode: " .. (vim.g.helix_mode and "⚡ ON" or "OFF"))
-end
-
-vim.keymap.set("n", "<leader>th", _G.toggle_helix_mode, { desc = "Toggle Helix mode" })
-
 local function apply_helix()
   local function map(mode, lhs, rhs, desc)
     vim.keymap.set(mode, lhs, rhs, { desc = "[Helix] " .. desc })
@@ -64,6 +52,18 @@ local function remove_helix()
   end
   helix_maps = {}
 end
+
+function _G.toggle_helix_mode()
+  vim.g.helix_mode = not vim.g.helix_mode
+  if vim.g.helix_mode then
+    apply_helix()
+  else
+    remove_helix()
+  end
+  vim.notify("Helix mode: " .. (vim.g.helix_mode and "⚡ ON" or "OFF"))
+end
+
+vim.keymap.set("n", "<leader>th", _G.toggle_helix_mode, { desc = "Toggle Helix mode" })
 
 return {
   -- Statusline: ⚡ icon when Helix mode is active
