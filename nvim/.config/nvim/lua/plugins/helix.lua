@@ -10,7 +10,7 @@ vim.g.helix_mode = false
 local function setup_animotion()
   require("AniMotion").setup({
     mode = "helix",
-    edit_keys = {},           -- don't hook operators, we handle them
+    edit_keys = { "c", "d", "y", "s", "r", "p" },
     clear_keys = { "<Esc>", ";", "<C-c>" },
   })
 end
