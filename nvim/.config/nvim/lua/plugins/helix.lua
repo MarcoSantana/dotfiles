@@ -1,11 +1,21 @@
--- Helix-style keybindings with toggle
--- Movement keys always highlight selection (enter Visual mode first)
--- Operators work in both Normal (no selection) and Visual (active selection)
+-- Helix-style editing with AniMotion.nvim + operator overrides toggle
+-- AniMotion handles selection-on-movement (w/b/e), always active
+-- <leader>th toggles additional Helix operator overrides + ⚡ icon
 
 local helix_maps = {}
 
 vim.g.helix_mode = false
 
+-- AniMotion: selection-first word movements (always on)
+local function setup_animotion()
+  require("AniMotion").setup({
+    mode = "helix",
+    edit_keys = {},           -- don't hook operators, we handle them
+    clear_keys = { "<Esc>", ";", "<C-c>" },
+  })
+end
+
+-- Helix operator overrides (toggled via <leader>th)
 local function map(modes, lhs, rhs, desc)
   if type(modes) == "string" then
     modes = { modes }
@@ -17,33 +27,7 @@ local function map(modes, lhs, rhs, desc)
 end
 
 local function apply_helix()
-  -- Movement: enter Visual mode first, so selection follows cursor
-  local function move(lhs, cmd, desc)
-    map("n", lhs, function()
-      local c = vim.v.count > 0 and tostring(vim.v.count) or ""
-      vim.cmd("normal! v" .. c .. cmd)
-    end, desc)
-  end
-
-  move("w", "w", "select word forward")
-  move("b", "b", "select word backward")
-  move("e", "e", "select word end")
-  move("j", "j", "select down")
-  move("k", "k", "select up")
-  move("h", "h", "select left")
-  move("l", "l", "select right")
-  move("}", "}", "select paragraph forward")
-  move("{", "{", "select paragraph backward")
-  move("0", "0", "select to line start")
-  move("$", "$", "select to line end")
-  move("^", "^", "select to first non-blank")
-  move("G", "G", "select to end")
-  move("%", "%", "select matching bracket")
-  move("(", "(", "select sentence backward")
-  move(")", ")", "select sentence forward")
-  move("gg", "gg", "select to top")
-
-  -- Selection commands (work in Normal AND Visual)
+  -- Selection commands
   map({ "n", "v" }, "x", "V", "select line")
 
   map({ "n", "v" }, "X", function()
@@ -54,7 +38,7 @@ local function apply_helix()
     end
   end, "shrink selection")
 
-  -- Duplicate (Normal: yyp, Visual: yank selection then paste)
+  -- Duplicate line
   map({ "n", "v" }, "C", function()
     local m = vim.fn.mode()
     if m == "n" or m == "no" then
@@ -73,7 +57,7 @@ local function apply_helix()
     end
   end, "duplicate line up")
 
-  -- Tree-sitter expand/shrink selection
+  -- Tree-sitter expand/shrink
   map("n", "<A-o>", function()
     require("nvim-treesitter.ts_utils").update_selection(vim.fn.getpos("."))
   end, "expand selection")
@@ -115,7 +99,13 @@ end
 vim.keymap.set("n", "<leader>th", _G.toggle_helix_mode, { desc = "Toggle Helix mode" })
 
 return {
-  -- Statusline: ⚡ icon when Helix mode is active
+  {
+    "luiscassih/AniMotion.nvim",
+    event = "VeryLazy",
+    config = setup_animotion,
+  },
+
+  -- Statusline: ⚡ icon
   {
     "nvim-lualine/lualine.nvim",
     optional = true,
