@@ -1,4 +1,5 @@
 {
+  "AniMotion.nvim": { "branch": "main", "commit": "92504a0f2c6c3e2245cef71668e7badf8052eb03" },
   "LazyVim": { "branch": "main", "commit": "c10948c50b18fae7f256433afdef09e432410480" },
   "SchemaStore.nvim": { "branch": "main", "commit": "8fa7f9cb8805f8abf27432d4b1e7c4be83d76807" },
   "avante.nvim": { "branch": "main", "commit": "044f2ec3b23ecba3cbdd694ae15f05b4e06c429b" },
