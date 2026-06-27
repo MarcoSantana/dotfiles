@@ -40,10 +40,20 @@ helix.lua
 
 **Key insight**: `apply_helix` and `remove_helix` are `local` functions defined BEFORE `_G.toggle_helix_mode` (Lua hoisting fix applied — commit `ff5a447`).
 
+**Core mechanic**: Every movement key enters Visual mode first (`vw`, `vj`, etc.), so selection highlights follow the cursor — just like Helix. Subsequent presses extend naturally (Visual mode defaults). `Esc` collapses. Counts work (`3w` → `v3w`).
+
 **Overrides applied when ON**:
 
 | Key | Behavior | Original |
 |-----|----------|----------|
+| `w`/`b`/`e` | select word forward/backward/end (auto-visual) | move cursor |
+| `j`/`k` | select down/up (auto-visual) | move cursor |
+| `h`/`l` | select left/right (auto-visual) | move cursor |
+| `{`/`}` | select paragraph backward/forward | move paragraph |
+| `0`/`$`/`^` | select to line start/end/first-nonblank | move |
+| `G`/`gg` | select to end/top | move |
+| `%` | select matching bracket | jump to match |
+| `(`/`)` | select sentence backward/forward | move sentence |
 | `x` | select whole line (`V`) | delete char |
 | `X` | shrink selection up one line | delete char backward |
 | `C` | duplicate line down (`yyp`) | change to end of line |
@@ -56,6 +66,8 @@ helix.lua
 | `A-j` | prev diagnostic | — |
 
 **Turning OFF** deletes all tracked maps via `vim.keymap.del`. Default Neovim behavior returns automatically.
+
+**Operators** (`d`, `y`, `c`, `p`, etc.) work naturally on the Visual selection. After acting, Neovim returns to Normal mode; next movement re-enters Visual mode.
 
 ## Toggle Reference
 
