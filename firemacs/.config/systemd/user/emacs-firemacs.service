@@ -1,0 +1,12 @@
+[Unit]
+Description=Emacs Daemon (firemacs)
+
+[Service]
+Type=forking
+Environment=PATH=/home/msantana/.nvm/versions/node/v24.14.0/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/emacs --init-directory /home/msantana/.emacs.d.firemacs --daemon=firemacs
+ExecStop=/usr/bin/emacsclient -s firemacs --eval "(kill-emacs)"
+Restart=always
+
+[Install]
+WantedBy=default.target
