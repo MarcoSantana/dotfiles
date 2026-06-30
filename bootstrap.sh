@@ -111,6 +111,7 @@ EDITORS=$(choose "Pick your weapons" \
   "helix" \
   "zed" \
   "emacs (doom)" \
+  "emacs (firemacs)" \
   "vim")
 
 # --- Category: Desktop / WM ---
@@ -305,6 +306,7 @@ for item in "${SHELL_ITEMS[@]}"; do
 done
 
 # --- Editors (non-APT) ---
+FIREMACS_SELECTED=0
 for item in "${EDITORS[@]}"; do
   case $item in
     "helix")
@@ -335,6 +337,16 @@ for item in "${EDITORS[@]}"; do
           ~/.emacs.d/bin/doom install --no-config --no-env 2>/dev/null || true
         fi
       fi
+      ;;
+    "emacs (firemacs)")
+      if ! command -v emacs &>/dev/null; then
+        install_apt emacs
+      fi
+      if [[ ! -d "$HOME/.emacs.d.firemacs" ]]; then
+        spinner "Installing Firemacs..." \
+          "git clone --depth 1 https://github.com/MarcoSantana/emacs ~/.emacs.d.firemacs"
+      fi
+      FIREMACS_SELECTED=1
       ;;
   esac
     done
@@ -424,6 +436,13 @@ header "Post-Install"
 # Caps Lock → Ctrl (GNOME)
 if command -v gsettings &>/dev/null && confirm "Map Caps Lock to Ctrl?"; then
   gsettings set org.gnome.desktop.input-sources xkb-options "['ctrl:nocaps']" 2>/dev/null && ok "  ✓ Caps Lock → Ctrl"
+fi
+
+# Firemacs daemon
+if [[ "$FIREMACS_SELECTED" -eq 1 && -d "$HOME/.emacs.d.firemacs" ]]; then
+  spinner "Starting Firemacs daemon..." \
+    "systemctl --user daemon-reload && systemctl --user enable --now emacs-firemacs"
+  ok "  ✓ Firemacs daemon"
 fi
 
 # Podman socket
