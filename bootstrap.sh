@@ -110,8 +110,11 @@ EDITORS=$(choose "Pick your weapons" \
   "neovim" \
   "helix" \
   "zed" \
+  "emacs (centaur)" \
+  "emacs (crafted)" \
   "emacs (doom)" \
   "emacs (firemacs)" \
+  "emacs (spacemacs)" \
   "vim")
 
 # --- Category: Desktop / WM ---
@@ -132,7 +135,9 @@ DEV=$(choose "Dev tooling" \
   "podman + podman-docker" \
   "docker.io" \
   "clojure tools (clj-kondo, cljfmt)" \
-  "stylelint, js-beautify, tidy")
+  "stylelint, js-beautify, tidy" \
+  "language servers (clojure-lsp, tinymist, luau)" \
+  "npm globals (vue-language-server, pi-agent, typescript-language-server)")
 
 # --- Category: Dotfiles (Stow) ---
 header "Dotfiles (Stow packages)"
@@ -140,7 +145,7 @@ header "Dotfiles (Stow packages)"
 AVAILABLE_STOW=()
 for d in "$DOTFILES"/*/; do
   name=$(basename "$d")
-  [[ "$name" == .git || "$name" == nixos || "$name" == assets ]] && continue
+  [[ "$name" == .git || "$name" == nixos || "$name" == assets || "$name" == scripts ]] && continue
   AVAILABLE_STOW+=("$name")
 done
 
@@ -306,7 +311,7 @@ for item in "${SHELL_ITEMS[@]}"; do
 done
 
 # --- Editors (non-APT) ---
-FIREMACS_SELECTED=0
+EMACS_SELECTED=()
 for item in "${EDITORS[@]}"; do
   case $item in
     "helix")
@@ -328,28 +333,30 @@ for item in "${EDITORS[@]}"; do
           "curl -fsSL https://zed.dev/install.sh | bash"
       fi
       ;;
+    "emacs (centaur)")
+      EMACS_SELECTED+=("centaur")
+      ;;
+    "emacs (crafted)")
+      EMACS_SELECTED+=("crafted")
+      ;;
     "emacs (doom)")
-      if ! command -v emacs &>/dev/null || [[ ! -d "$HOME/.emacs.d" ]]; then
-        install_apt emacs
-        if [[ ! -d "$HOME/.emacs.d" ]]; then
-          spinner "Installing Doom Emacs..." \
-            "git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.emacs.d"
-          ~/.emacs.d/bin/doom install --no-config --no-env 2>/dev/null || true
-        fi
-      fi
+      EMACS_SELECTED+=("doom")
       ;;
     "emacs (firemacs)")
-      if ! command -v emacs &>/dev/null; then
-        install_apt emacs
-      fi
-      if [[ ! -d "$HOME/.emacs.d.firemacs" ]]; then
-        spinner "Installing Firemacs..." \
-          "git clone --depth 1 https://github.com/MarcoSantana/emacs ~/.emacs.d.firemacs"
-      fi
-      FIREMACS_SELECTED=1
+      EMACS_SELECTED+=("firemacs")
+      ;;
+    "emacs (spacemacs)")
+      EMACS_SELECTED+=("spacemacs")
       ;;
   esac
-    done
+done
+
+if [[ ${#EMACS_SELECTED[@]} -gt 0 ]]; then
+  if ! command -v emacs &>/dev/null; then
+    install_apt emacs
+  fi
+  "$DOTFILES/scripts/emacs-daemons.sh" "${EMACS_SELECTED[@]}"
+fi
 
 # --- Yazi plugins ---
 if command -v ya &>/dev/null; then
@@ -378,7 +385,46 @@ for item in "${DEV[@]}"; do
         command -v stylelint &>/dev/null || npm install -g stylelint
         command -v js-beautify &>/dev/null || npm install -g js-beautify
       else
-        warn "npm not found — install stylelint/js-beautify/tidy manually"
+        warn "npm not found — install stylelint/js-beautify manually"
+      fi
+      ;;
+    "language servers (clojure-lsp, tinymist, luau)")
+      # clojure-lsp — binary install
+      if ! command -v clojure-lsp &>/dev/null; then
+        spinner "Installing clojure-lsp..." \
+          "curl -fsSL https://github.com/clojure-lsp/clojure-lsp/releases/latest/download/clojure-lsp-native-linux-amd64.zip -o /tmp/clojure-lsp.zip && unzip -o /tmp/clojure-lsp.zip -d /tmp && sudo mv /tmp/clojure-lsp /usr/local/bin/ && rm -f /tmp/clojure-lsp.zip"
+      fi
+      # tinymist (Typst LSP) — cargo or prebuilt
+      if ! command -v tinymist &>/dev/null; then
+        if command -v cargo &>/dev/null; then
+          spinner "Installing tinymist (Typst LSP)..." \
+            "cargo install tinymist"
+        else
+          warn "tinymist requires Rust — install via: cargo install tinymist"
+        fi
+      fi
+      # luau-lsp
+      if ! command -v luau-lsp &>/dev/null; then
+        spinner "Installing luau-lsp..." \
+          "curl -fsSL https://github.com/luau-lang/luau/releases/latest/download/luau-ubuntu-x86_64.zip -o /tmp/luau.zip && unzip -o /tmp/luau.zip -d /tmp && sudo mv /tmp/luau-lsp /usr/local/bin/ && rm -f /tmp/luau.zip"
+      fi
+      ;;
+    "npm globals (vue-language-server, pi-agent, typescript-language-server)")
+      if command -v npm &>/dev/null; then
+        # Load nvm if available for correct node version
+        export NVM_DIR="$HOME/.nvm"
+        [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh" || true
+        command -v vue-language-server &>/dev/null || \
+          spinner "Installing @vue/language-server..." \
+            "npm install -g @vue/language-server"
+        command -v typescript-language-server &>/dev/null || \
+          spinner "Installing typescript-language-server..." \
+            "npm install -g typescript-language-server"
+        command -v pi &>/dev/null || \
+          spinner "Installing Pi AI coding agent..." \
+            "npm install -g @earendil-works/pi-coding-agent"
+      else
+        warn "npm not found — install npm globals manually"
       fi
       ;;
     "mise (runtime version manager)")
@@ -438,12 +484,14 @@ if command -v gsettings &>/dev/null && confirm "Map Caps Lock to Ctrl?"; then
   gsettings set org.gnome.desktop.input-sources xkb-options "['ctrl:nocaps']" 2>/dev/null && ok "  ✓ Caps Lock → Ctrl"
 fi
 
-# Firemacs daemon
-if [[ "$FIREMACS_SELECTED" -eq 1 && -d "$HOME/.emacs.d.firemacs" ]]; then
-  spinner "Starting Firemacs daemon..." \
-    "systemctl --user daemon-reload && systemctl --user enable --now emacs-firemacs"
-  ok "  ✓ Firemacs daemon"
-fi
+# Restart emacs daemons after stow (stow may replace service files)
+for flavor in "${EMACS_SELECTED[@]}"; do
+  local svc="emacs-${flavor}"
+  if systemctl --user is-enabled "$svc" &>/dev/null; then
+    systemctl --user daemon-reload 2>/dev/null
+    systemctl --user restart "$svc" 2>/dev/null && ok "  ✓ $svc restarted" || true
+  fi
+done
 
 # Podman socket
 if command -v podman &>/dev/null && confirm "Enable podman rootless socket?"; then
