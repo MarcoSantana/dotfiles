@@ -662,6 +662,9 @@ mkdir -p "$HOME/.local/bin"
 if [[ ! -L "$HOME/.local/bin/dotfiles" ]]; then
   ln -sf "$DOTFILES/scripts/dotfiles.sh" "$HOME/.local/bin/dotfiles" && ok "  ✓ dotfiles CLI → ~/.local/bin/dotfiles"
 fi
+if [[ ! -L "$HOME/.local/bin/emacs-manager" ]]; then
+  ln -sf "$DOTFILES/scripts/emacs-manager" "$HOME/.local/bin/emacs-manager" && ok "  ✓ emacs-manager → ~/.local/bin/emacs-manager"
+fi
 
 # ── Done ─────────────────────────────────────────────────────────────
 DURATION=$((SECONDS - START))

@@ -80,7 +80,7 @@ This function should only modify configuration layer settings."
      treemacs
       yaml
       docker
-      gleam
+      (gleam :variables gleam-format-on-save t gleam-target 'javascript)
       (restclient :variables restclient-prettify-response t))
 
 
@@ -108,7 +108,8 @@ This function should only modify configuration layer settings."
                                       dockerfile-mode
                                       typst-ts-mode
                                       typst-preview
-                                      websocket)
+                                      websocket
+                                      ob-gleam)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -700,6 +701,158 @@ before packages are loaded."
   (spacemacs/set-leader-keys-for-major-mode 'restclient-mode
     "r" 'restclient
     "s" 'restclient-send-current)
+
+  ;; --- Gleam / Lustre Powerhouse ---
+  (with-eval-after-load 'gleam-ts-mode
+    ;; ── Format on save (already enabled via layer variable) ──
+    (setq gleam-ts-indent-offset 2)
+
+    ;; ── Additional gleam commands ──
+    (defun my/gleam-check ()
+      "Run `gleam check'."
+      (interactive)
+      (shell-command "gleam check" "*gleam-check*"))
+
+    (defun my/gleam-docs ()
+      "Run `gleam docs'."
+      (interactive)
+      (shell-command "gleam docs" "*gleam-docs*"))
+
+    (defun my/gleam-docs-build ()
+      "Run `gleam docs build'."
+      (interactive)
+      (shell-command "gleam docs build" "*gleam-docs*"))
+
+    (defun my/gleam-format-project ()
+      "Run `gleam format' on whole project."
+      (interactive)
+      (let ((root (or (projectile-project-root)
+                      (locate-dominating-file default-directory "gleam.toml")
+                      (user-error "Not in a gleam project"))))
+        (async-shell-command
+         (format "cd %s && gleam format" (shell-quote-argument root))
+         "*gleam-format*")
+        (message "Formatting gleam project…")))
+
+    (defun my/gleam-toggle-test-file ()
+      "Switch between src/foo.gleam and test/foo_test.gleam."
+      (interactive)
+      (let* ((file (or (buffer-file-name) (user-error "Not visiting a file")))
+             (dir (file-name-directory file))
+             (name (file-name-base file)))
+        (cond
+         ((string-match-p "\\btest/" dir)
+          (let* ((src (replace-regexp-in-string "\\btest/" "src/" file))
+                 (src (if (string-suffix-p "_test" name)
+                          (replace-regexp-in-string "_test\\.gleam$" ".gleam" src)
+                        src)))
+            (if (file-exists-p src) (find-file src)
+              (user-error "Source not found: %s" src))))
+         ((string-match-p "\\bsrc/" dir)
+          (let ((test (replace-regexp-in-string "\\.gleam$" "_test.gleam"
+                       (replace-regexp-in-string "\\bsrc/" "test/" file))))
+            (if (file-exists-p test) (find-file test)
+              (user-error "Test not found: %s" test))))
+         (t (user-error "Not in src/ or test/ directory")))))
+
+    (defun my/gleam-new-project (name)
+      "Create a new Gleam project."
+      (interactive "sProject name: ")
+      (let ((dir (expand-file-name name "~/projects/gleam")))
+        (if (file-exists-p dir)
+            (user-error "Project %s already exists" name)
+          (async-shell-command
+           (format "cd ~/projects && gleam new %s" (shell-quote-argument name))
+           "*gleam-new*")
+          (message "Creating gleam project %s…" name))))
+
+    (defun my/gleam-add-dependency (pkg)
+      "Add a gleam dependency."
+      (interactive "sPackage: ")
+      (let ((root (or (projectile-project-root)
+                      (locate-dominating-file default-directory "gleam.toml")
+                      (user-error "Not in a gleam project"))))
+        (async-shell-command
+         (format "cd %s && gleam add %s" (shell-quote-argument root)
+                 (shell-quote-argument pkg))
+         "*gleam-add*")
+        (message "Adding %s…" pkg)))
+
+    ;; ── Lustre dev server ──
+    (defvar my/gleam-lustre-process nil "Lustre dev server process.")
+
+    (defun my/gleam-lustre-dev ()
+      "Start Lustre dev server."
+      (interactive)
+      (let ((root (or (projectile-project-root)
+                      (locate-dominating-file default-directory "gleam.toml")
+                      (user-error "Not in a gleam project"))))
+        (when (and my/gleam-lustre-process
+                   (process-live-p my/gleam-lustre-process))
+          (delete-process my/gleam-lustre-process))
+        (setq my/gleam-lustre-process
+              (start-process "lustre-dev" "*lustre-dev*"
+                             "gleam" "run" "lustre_dev_tools" "dev"))
+        (set-process-sentinel
+         my/gleam-lustre-process
+         (lambda (proc event)
+           (when (string-match-p "finished\\|exited" event)
+             (setq my/gleam-lustre-process nil))))
+        (display-buffer "*lustre-dev*")
+        (message "Lustre dev server starting…")))
+
+    (defun my/gleam-lustre-dev-stop ()
+      "Stop Lustre dev server."
+      (interactive)
+      (when (and my/gleam-lustre-process
+                 (process-live-p my/gleam-lustre-process))
+        (kill-process my/gleam-lustre-process)
+        (setq my/gleam-lustre-process nil)
+        (message "Lustre dev server stopped.")))
+
+    (defun my/gleam-lustre-build ()
+      "Build Lustre app for production."
+      (interactive)
+      (let ((root (or (projectile-project-root)
+                      (locate-dominating-file default-directory "gleam.toml")
+                      (user-error "Not in a gleam project"))))
+        (shell-command
+         (format "cd %s && gleam run lustre_dev_tools build"
+                 (shell-quote-argument root))
+         "*lustre-build*")))
+
+    ;; ── Extra keybindings (major-mode leader is `,`) ──
+    (spacemacs/set-leader-keys-for-major-mode 'gleam-ts-mode
+      "cc"  'spacemacs//gleam-run
+      "cb"  'spacemacs//gleam-build
+      "ck"  'my/gleam-check
+      "cd"  'my/gleam-docs
+      "cD"  'my/gleam-docs-build
+      "ta"  'spacemacs//gleam-test-project
+      "tf"  'my/gleam-toggle-test-file
+      "="   'gleam-ts-format
+      "=p"  'my/gleam-format-project
+      "T="  'spacemacs//gleam-toggle-format-on-save
+      "np"  'my/gleam-new-project
+      "ad"  'my/gleam-add-dependency
+      "ld"  'my/gleam-lustre-dev
+      "ls"  'my/gleam-lustre-dev-stop
+      "lb"  'my/gleam-lustre-build))
+
+  ;; ── Org-babel Gleam ──
+  (use-package ob-gleam
+    :ensure t
+    :after org
+    :config
+    (add-to-list 'org-babel-load-languages '(gleam . t)))
+
+  ;; ── Gleam compilation error regex ──
+  (with-eval-after-load 'compile
+    (add-to-list 'compilation-error-regexp-alist-alist
+                 '(gleam
+                   "^[[:space:]]*┌─ \\([^:]+?\\):\\([0-9]+\\):\\([0-9]+\\)"
+                   1 2 3))
+    (add-to-list 'compilation-error-regexp-alist 'gleam))
 
   ;; --- Typst Powerhouse Configuration ---
   (use-package typst-ts-mode

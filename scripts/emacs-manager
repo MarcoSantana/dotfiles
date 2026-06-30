@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+
+# --- Multi-Emacs Manager (Gum Edition) ---
+# A pretty CLI to manage Spacemacs, Doom, Crafted, and Centaur.
+
+set -e
+
+# --- Configuration ---
+DISTROS=("spacemacs" "doom" "crafted" "centaur" "firemacs")
+BIN_DIR="$HOME/.local/bin"
+SCRIPT_PATH="$BIN_DIR/emacs-manager"
+
+# --- Gum Installation Check ---
+install_gum() {
+    echo " gum not found. Installing to $BIN_DIR..."
+    mkdir -p "$BIN_DIR"
+    TEMP_DIR=$(mktemp -d)
+    # Get latest version for Linux x86_64
+    curl -sL https://api.github.com/repos/charmbracelet/gum/releases/latest | \
+        grep "browser_download_url.*linux_x86_64.tar.gz" | \
+        cut -d : -f 2,3 | tr -d \" | wget -qi - -O "$TEMP_DIR/gum.tar.gz"
+    tar -xzf "$TEMP_DIR/gum.tar.gz" -C "$TEMP_DIR"
+    mv "$TEMP_DIR"/gum_*/gum "$BIN_DIR/gum"
+    chmod +x "$BIN_DIR/gum"
+    rm -rf "$TEMP_DIR"
+    echo " gum installed successfully!"
+}
+
+if ! command -v gum &> /dev/null; then
+    install_gum
+fi
+
+# --- Helper Functions ---
+header() {
+    gum style \
+        --foreground 212 --border-foreground 212 --border double \
+        --align center --width 40 --margin "1 2" --padding "0 1" \
+        "EMACS MULTI-DISTRO MANAGER"
+}
+
+get_status_icon() {
+    if systemctl --user is-active --quiet "emacs-$1.service"; then
+        echo "●"
+    else
+        echo "○"
+    fi
+}
+
+# --- Main Logic ---
+
+# 1. Main Menu
+main_menu() {
+    clear
+    header
+    
+    CHOICE=$(gum choose "🚀 Launch Client" "🛠 Manage Daemons" "🔄 Sync Doom" "📁 Open Config" "❌ Exit")
+
+    case "$CHOICE" in
+        "🚀 Launch Client") launch_client ;;
+        "🛠 Manage Daemons") manage_daemons ;;
+        "🔄 Sync Doom") sync_doom ;;
+        "📁 Open Config") open_config ;;
+        "❌ Exit") exit 0 ;;
+    esac
+}
+
+# 2. Launch Client
+launch_client() {
+    DISTRO=$(gum choose "${DISTROS[@]}")
+    MODE=$(gum choose "🖥 GUI Frame" "⌨ Terminal Frame")
+    
+    # Ensure daemon is running
+    if ! systemctl --user is-active --quiet "emacs-$DISTRO.service"; then
+        if gum confirm "Daemon is not running. Start it?"; then
+            systemctl --user start "emacs-$DISTRO.service"
+        else
+            main_menu
+        fi
+    fi
+
+    case "$MODE" in
+        "🖥 GUI Frame")
+            if [ "$DISTRO" == "doom" ]; then
+                EMACSDIR=~/.emacs.d.doom DOOMDIR=~/.doom.d emacsclient -c -n -s doom -a "" &
+            elif [ "$DISTRO" == "firemacs" ]; then
+                emacsclient -c -n -s firemacs -a "" &
+            else
+                emacsclient -c -n -s "$DISTRO" -a "" &
+            fi
+            ;;
+        "⌨ Terminal Frame")
+            if [ "$DISTRO" == "doom" ]; then
+                EMACSDIR=~/.emacs.d.doom DOOMDIR=~/.doom.d emacsclient -t -s doom -a ""
+            elif [ "$DISTRO" == "firemacs" ]; then
+                emacsclient -t -s firemacs -a ""
+            else
+                emacsclient -t -s "$DISTRO" -a ""
+            fi
+            ;;
+    esac
+    main_menu
+}
+
+# 3. Manage Daemons
+manage_daemons() {
+    # Prepare list with status icons
+    LIST=()
+    for d in "${DISTROS[@]}"; do
+        ICON=$(get_status_icon "$d")
+        LIST+=("$ICON $d")
+    done
+
+    SELECTED=$(gum choose "${LIST[@]}" "⬅ Back")
+    [[ "$SELECTED" == "⬅ Back" ]] && main_menu
+    
+    DISTRO=$(echo "$SELECTED" | awk '{print $2}')
+    ACTION=$(gum choose "▶ Start" "⏹ Stop" "🔄 Restart" "📋 Status" "⬅ Back")
+    
+    case "$ACTION" in
+        "▶ Start")   systemctl --user start "emacs-$DISTRO.service" ;;
+        "⏹ Stop")    systemctl --user stop "emacs-$DISTRO.service" ;;
+        "🔄 Restart") 
+            gum spin --spinner dot --title "Restarting $DISTRO..." -- \
+                systemctl --user restart "emacs-$DISTRO.service" 
+            ;;
+        "📋 Status") 
+            systemctl --user status "emacs-$DISTRO.service" || true
+            gum input --placeholder "Press Enter to continue..."
+            ;;
+        "⬅ Back") manage_daemons ;;
+    esac
+    manage_daemons
+}
+
+# 4. Sync Doom
+sync_doom() {
+    gum spin --spinner monkey --title "Running Doom Sync..." -- \
+        bash -c "EMACSDIR=~/.emacs.d.doom DOOMDIR=~/.doom.d ~/.emacs.d.doom/bin/doom sync"
+    gum style --foreground 10 "✓ Doom Sync Complete!"
+    sleep 2
+    main_menu
+}
+
+# 5. Open Config
+open_config() {
+    DISTRO=$(gum choose "${DISTROS[@]}")
+    case "$DISTRO" in
+        spacemacs) FILE="$HOME/.spacemacs" ;;
+        doom)      FILE="$HOME/.doom.d/config.el" ;;
+        crafted)   FILE="$HOME/.emacs.d.crafted/init.el" ;;
+        centaur)   FILE="$HOME/.emacs.d.centaur/custom.el" ;;
+        firemacs)  FILE="$HOME/.emacs.d.firemacs/init.el" ;;
+    esac
+    
+    # Open in current terminal with the distro itself
+    if [ "$DISTRO" == "doom" ]; then
+        EMACSDIR=~/.emacs.d.doom DOOMDIR=~/.doom.d emacsclient -t -s doom -a "" "$FILE"
+    else
+        emacsclient -t -s "$DISTRO" -a "" "$FILE"
+    fi
+    main_menu
+}
+
+# --- Run Loop ---
+main_menu

@@ -1,0 +1,178 @@
+#+TITLE: Gleam / Lustre Development Setup
+#+DATE: 2026-06-30
+#+OPTIONS: toc:nil num:nil
+
+* Overview
+
+This document catalogs all the Gleam and Lustre development tooling
+across Emacs flavors.  The goal is to make firemacs the dedicated
+gleam/lustre powerhouse, with spacemacs as a secondary environment.
+
+* Emacs Flavors
+
+** firemacs — primary gleam/lustre powerhouse
+
+- Init dir: ~/.emacs.d.firemacs~ (symlinked via stow from ~/dotfiles/firemacs/~)
+- Daemon name: =firemacs= (=emacs-firemacs.service=)
+- Config modules: =init.el=, =languages.el=, =gleam.el=, =keybinds.el=
+
+Features (all in =gleam.el=):
+
+| Feature              | Detail                                        |
+|----------------------+-----------------------------------------------|
+| Syntax highlighting  | =gleam-ts-mode= (tree-sitter)                 |
+| LSP                  | =eglot= + =gleam lsp=                         |
+| Format on save       | =gleam-ts-format-on-save= (built-in)          |
+| Build                | =my/gleam-build= → =gleam build=              |
+| Test                 | =my/gleam-test= → =gleam test=               |
+| Check                | =my/gleam-check= → =gleam check=              |
+| Run                  | =my/gleam-run-with-args= → =gleam run=        |
+| Format project       | =my/gleam-format-project=                     |
+| Docs                 | =my/gleam-docs= / =my/gleam-docs-build=       |
+| Toggle test file     | =my/gleam-toggle-test-file= (src ⇄ test)      |
+| New project          | =my/gleam-new-project= (in ~/projects/gleam/) |
+| Add dependency       | =my/gleam-add-dependency= (=gleam add=)       |
+| Lustre dev server    | =my/gleam-lustre-dev= / =stop= / =restart=     |
+| Lustre build         | =my/gleam-lustre-build=                        |
+| Org-babel            | =ob-gleam= (eval gleam in org code blocks)    |
+| Compilation errors   | Regex for =┌─ file.gleam:12:5= format         |
+
+Keybindings:
+
+- =SPC m g=: gleam prefix (leader key)
+- Buffer-local =C-c C-b/t/c/r/f/d=: build, test, check, run, format, docs
+
+| Binding      | Command                     |
+|--------------+-----------------------------|
+| =SPC m g b=  | gleam build                 |
+| =SPC m g t=  | gleam test                  |
+| =SPC m g c=  | gleam check                 |
+| =SPC m g r=  | gleam run                   |
+| =SPC m g f=  | gleam format project        |
+| =SPC m g d=  | gleam docs                  |
+| =SPC m g TAB=| toggle test file            |
+| =SPC m g n=  | new gleam project           |
+| =SPC m g a=  | add dependency              |
+| =SPC m g l d=| lustre dev server start      |
+| =SPC m g l s=| lustre dev server stop       |
+| =SPC m g l r=| lustre dev server restart    |
+| =SPC m g l b=| lustre build                 |
+
+** spacemacs — secondary gleam/lustre environment
+
+- Init dir: ~/.emacs.d.spacemacs~
+- Config: ~/.spacemacs~ (symlinked via stow)
+- Uses the built-in Spacemacs =gleam= layer
+
+Layer variables (in =dotspacemacs-configuration-layers=):
+
+#+BEGIN_SRC elisp
+(gleam :variables gleam-format-on-save t gleam-target 'javascript)
+#+END_SRC
+
+Additional packages: =ob-gleam=
+
+Custom configuration (in =dotspacemacs/user-config=) — full gleam/lustre
+toolkit wrapped in =(with-eval-after-load 'gleam-ts-mode ...)=:
+
+| Feature              | Detail                                        |
+|----------------------+-----------------------------------------------|
+| Format on save       | =gleam-format-on-save= = t                     |
+| Target               | JavaScript (for Lustre browser apps)           |
+| Format project       | =my/gleam-format-project=                     |
+| Check                | =my/gleam-check=                              |
+| Docs                 | =my/gleam-docs= / =my/gleam-docs-build=        |
+| Toggle test file     | =my/gleam-toggle-test-file=                   |
+| New project          | =my/gleam-new-project=                        |
+| Add dependency       | =my/gleam-add-dependency=                     |
+| Lustre dev server    | =my/gleam-lustre-dev= / =my/gleam-lustre-dev-stop= |
+| Lustre build         | =my/gleam-lustre-build=                       |
+| Org-babel            | =ob-gleam=                                    |
+| Compilation errors   | Regex for gleam error format                  |
+
+Major-mode leader keybindings (=,=):
+
+| Binding | Command                     |
+|---------+-----------------------------|
+| =,cb=   | gleam build                 |
+| =,cc=   | gleam run                   |
+| =,ck=   | gleam check                 |
+| =,cd=   | gleam docs                  |
+| =,cD=   | gleam docs build            |
+| =,ta=   | gleam test (all)            |
+| =,tf=   | toggle test file            |
+| =,==    | gleam format buffer         |
+| =,=p=   | gleam format project        |
+| =,T==   | toggle format on save       |
+| =,np=   | new gleam project           |
+| =,ad=   | add dependency              |
+| =,ld=   | lustre dev server start     |
+| =,ls=   | lustre dev server stop      |
+| =,lb=   | lustre build                |
+
+* Emacs Manager
+
+The =em= command (alias for =emacs-manager=) manages all Emacs flavors
+via a gum TUI.
+
+- Script: =~/dotfiles/scripts/emacs-manager= (symlinked to =~/.local/bin/emacs-manager=)
+- Bootstrap: installed by =bootstrap.sh= in the post-install step
+- Stow: not stowed directly — handled via bootstrap's scripts symlink
+
+Distros managed: spacemacs, doom, crafted, centaur, *firemacs* (added 2026-06-30)
+
+Quick-launch aliases (in =.zshrc=):
+
+| Alias          | Action                              |
+|----------------+-------------------------------------|
+| =se-firemacs=  | GUI frame → =emacsclient -s firemacs= |
+| =st-firemacs=  | Terminal frame → =emacsclient -s firemacs= |
+| =se-spacemacs= | GUI frame → =emacsclient -s spacemacs= |
+| =st-spacemacs= | Terminal frame → =emacsclient -s spacemacs= |
+
+* Stow Packages
+
+Stow manages dotfiles from =~/dotfiles/= to =$HOME=.
+
+Relevant packages:
+
+| Package    | Contents                                                  |
+|------------+-----------------------------------------------------------|
+| =firemacs= | =~/.emacs.d.firemacs/= config + =~/.config/systemd/user/emacs-firemacs.service= |
+| =spacemacs= | =~/.spacemacs= + =~/.spacemacs.env=                      |
+| =helix=    | =~/.config/helix/=                                       |
+
+Deployment: =cd ~/dotfiles && stow -R firemacs spacemacs=
+
+* Project: scribble_stash
+
+A Gleam + Lustre web app (JavaScript target).
+
+- Location: =~/projects/gleam/scribble_stash/
+- Dependencies: lustre 5.7+, gleam_stdlib, gleam_javascript
+- Dev deps: gleeunit, lustre_dev_tools 2.3.6+
+- Target: JavaScript (browser SPA)
+
+Quick start:
+
+#+BEGIN_SRC sh
+cd ~/projects/gleam/scribble_stash
+gleam build          # compile
+gleam test           # run tests
+gleam run lustre_dev_tools dev    # start dev server
+gleam run lustre_dev_tools build  # production build
+#+END_SRC
+
+* File Inventory
+
+| File                                              | Purpose                           |
+|---------------------------------------------------+-----------------------------------|
+| =~/dotfiles/firemacs/.emacs.d.firemacs/gleam.el=  | firemacs gleam/lustre module      |
+| =~/dotfiles/firemacs/.emacs.d.firemacs/init.el=   | firemacs init (loads gleam.el)    |
+| =~/dotfiles/firemacs/.emacs.d.firemacs/languages.el=| gleam ref → gleam.el             |
+| =~/dotfiles/firemacs/.emacs.d.firemacs/keybinds.el=| SPC m g keybindings              |
+| =~/dotfiles/firemacs/.emacs.d.firemacs/custom.el=  | package-selected-packages         |
+| =~/dotfiles/spacemacs/.spacemacs=                 | spacemacs config (gleam layer)    |
+| =~/dotfiles/scripts/emacs-manager=                | em TUI manager (gum)              |
+| =~/dotfiles/gleam-lustre.org=                     | this file                         |
+| =~/.zshrc=                                        | se-firemacs/st-firemacs aliases   |
