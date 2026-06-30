@@ -78,9 +78,10 @@ This function should only modify configuration layer settings."
      react
      pdf
      treemacs
-     yaml
-     docker
-     (restclient :variables restclient-prettify-response t))
+      yaml
+      docker
+      gleam
+      (restclient :variables restclient-prettify-response t))
 
 
    ;; List of additional packages that will be installed without being wrapped

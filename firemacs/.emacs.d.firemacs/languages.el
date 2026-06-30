@@ -48,6 +48,25 @@
   (setq markdown-fontify-code-blocks-natively t))
 
 ;; ---------------------------------------------------------------------------
+;;  Gleam — BEAM language + Lustre web framework
+;; ---------------------------------------------------------------------------
+(use-package gleam-ts-mode
+  :ensure t
+  :defer t
+  :mode "\\.gleam\\'"
+  :hook (gleam-ts-mode . eglot-ensure)
+  :config
+  (unless (treesit-language-available-p 'gleam)
+    (with-eval-after-load 'treesit
+      (add-to-list 'treesit-language-source-alist
+                   '(gleam . ("https://github.com/gleam-lang/tree-sitter-gleam" "v1.0.0")))
+      (gleam-ts-install-grammar))))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(gleam-ts-mode . ("gleam" "lsp"))))
+
+;; ---------------------------------------------------------------------------
 ;;  Supabase-adjacent — SQL, JSON, YAML, TOML
 ;; ---------------------------------------------------------------------------
 (use-package sql

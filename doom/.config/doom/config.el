@@ -158,6 +158,21 @@
   (setq projectile-project-root-files-bottom-up
         (remove ".git" projectile-project-root-files-bottom-up)))
 
+;; ── Gleam / Lustre ─────────────────────────────────────────────
+(use-package! gleam-ts-mode
+  :mode "\\.gleam\\'"
+  :config
+  (add-hook 'gleam-ts-mode-hook #'lsp-deferred)
+  (unless (treesit-language-available-p 'gleam)
+    (after! treesit
+      (add-to-list 'treesit-language-source-alist
+                   '(gleam . ("https://github.com/gleam-lang/tree-sitter-gleam" "v1.0.0")))
+      (gleam-ts-install-grammar))))
+
+(after! lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(gleam-ts-mode . "gleam"))
+  (setq lsp-gleam-server-command '("gleam" "lsp")))
+
 (after! clojure-mode
   ;; Enable paredit for powerful structural editing
   (add-hook 'clojure-mode-hook #'enable-paredit-mode)
