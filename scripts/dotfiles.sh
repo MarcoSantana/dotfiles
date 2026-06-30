@@ -93,6 +93,20 @@ doctor() {
   done
   [[ $broken -eq 0 ]] && echo "  ✓ No broken symlinks"
 
+  # Global gitignore / gitattributes
+  if [[ -f "$HOME/.config/git/ignore" ]]; then
+    echo "  ✓ Global gitignore: ~/.config/git/ignore"
+  else
+    echo "  ✗ Global gitignore missing"
+    ((issues++))
+  fi
+  if [[ -f "$HOME/.config/git/attributes" ]]; then
+    echo "  ✓ Global gitattributes: ~/.config/git/attributes"
+  else
+    echo "  ✗ Global gitattributes missing"
+    ((issues++))
+  fi
+
   # Nerd Font
   if ls "$HOME/.local/share/fonts"/FiraCodeNerdFont* &>/dev/null 2>&1; then
     echo "  ✓ FiraCode Nerd Font installed"

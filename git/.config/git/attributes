@@ -1,0 +1,50 @@
+# Text files — normalize to LF
+*.text text=auto
+*.md text
+*.txt text
+*.json text
+*.yaml text
+*.yml text
+*.toml text
+*.xml text
+*.html text
+*.css text
+*.js text
+*.ts text
+*.el text
+*.lisp text
+*.clj text
+*.cljs text
+*.edn text
+*.typ text
+*.sh text eol=lf
+*.zsh text eol=lf
+*.bash text eol=lf
+
+# Git
+*.gitattributes text
+*.gitignore text
+
+# Diff
+*.png diff=png
+*.jpg diff=jpg
+
+# Binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.gz binary
+*.bz2 binary
+*.xz binary
+*.deb binary
+*.rpm binary

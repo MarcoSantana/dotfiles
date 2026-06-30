@@ -601,8 +601,8 @@ for pkg in "${STOW_SELECTED[@]}"; do
   fi
 done
 
-# Top-level files (bashrc, bash_profile, gitconfig, vimrc, kakrc)
-for f in bashrc bash_profile gitconfig vimrc kakrc; do
+# Top-level files (bashrc, bash_profile, vimrc, kakrc)
+for f in bashrc bash_profile vimrc kakrc; do
   if [[ -f "$DOTFILES/$f" && ! -L "$HOME/.$f" ]]; then
     run ln -sf "$DOTFILES/$f" "$HOME/.$f"
     ok "  ✓ .$f"
