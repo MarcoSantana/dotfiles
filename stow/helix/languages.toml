@@ -43,6 +43,16 @@ language-servers = [ "clojure-lsp" ]
 [language-server.clojure-lsp]
 command = "clojure-lsp"
 
+# --- Gleam / Lustre ---
+[[language]]
+name = "gleam"
+auto-format = true
+language-servers = [ "gleam-language-server" ]
+
+[language-server.gleam-language-server]
+command = "gleam"
+args = ["lsp"]
+
 # --- SQL / PostgreSQL (Supabase) ---
 [[language]]
 name = "sql"

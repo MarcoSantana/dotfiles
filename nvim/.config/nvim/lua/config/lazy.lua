@@ -28,6 +28,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.lang.markdown" },
     { import = "lazyvim.plugins.extras.lang.tailwind" },
     { import = "lazyvim.plugins.extras.lang.clojure" },
+    { import = "lazyvim.plugins.extras.lang.gleam" },
     { import = "lazyvim.plugins.extras.lang.ruby" },
     -- import/override with your plugins
     { import = "plugins" },
