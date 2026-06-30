@@ -240,11 +240,51 @@ strip_hash() {
 
 # ── Apply system-wide ──────────────────────────────────────────────
 
+install_gtk_theme() {
+  local theme="$1"
+  local theme_dir="${XDG_DATA_HOME:-$HOME/.local/share}/themes"
+
+  # Catppuccin GTK (official GitHub releases)
+  if echo "$theme" | grep -qi "catppuccin"; then
+    local flavor accent
+    flavor=$(echo "$theme" | sed -E 's/Catppuccin-([A-Za-z]+).*/\1/' | tr '[:upper:]' '[:lower:]')
+    accent=$(echo "$theme" | sed -E 's/.*-([A-Za-z]+)-(Dark|Light)$/\1/' | tr '[:upper:]' '[:lower:]')
+    [[ -z "$accent" || "$accent" == "$flavor" ]] && accent="blue"
+    local zip_name="catppuccin-${flavor}-${accent}-standard+default.zip"
+    local url="https://github.com/catppuccin/gtk/releases/latest/download/${zip_name}"
+    local tmp; tmp=$(mktemp -d)
+    if curl -fsSL "$url" -o "$tmp/theme.zip"; then
+      unzip -qo "$tmp/theme.zip" -d "$tmp/extracted"
+      mkdir -p "$theme_dir"
+      cp -r "$tmp/extracted"/* "$theme_dir/"
+      ok "installed GTK theme: $theme"
+    else
+      warn "failed to download: $url"
+    fi
+    rm -rf "$tmp"
+    return
+  fi
+
+  # For non-Catppuccin themes, just warn and try gsettings anyway
+  warn "GTK theme '$theme' not installed (install manually: $theme_dir/)"
+}
+
 set_gtk_theme() {
   local theme="${TH_GTK:-}"
   [[ -z "$theme" ]] && return
+
+  # Check if installed
+  local theme_dir="${XDG_DATA_HOME:-$HOME/.local/share}/themes"
+  local usr_theme_dir="/usr/share/themes"
+  if [[ ! -d "$theme_dir/$theme" && ! -d "$usr_theme_dir/$theme" ]]; then
+    if gum confirm "GTK theme '$theme' not found. Install it?"; then
+      install_gtk_theme "$theme"
+    fi
+  fi
+
   if command -v gsettings &>/dev/null; then
-    gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null || true
+    gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null || \
+      warn "failed to set GTK theme (check that '$theme' is installed)"
     gsettings set org.gnome.desktop.interface color-scheme "prefer-dark" 2>/dev/null || true
     ok "GTK theme → $theme"
   fi
