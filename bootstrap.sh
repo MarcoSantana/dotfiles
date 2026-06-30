@@ -155,6 +155,10 @@ if ! $MINIMAL; then
     "waybar" \
     "hyprland" \
     "screenshot tools (maim, scrot, grim, slurp)")
+  # --full: drop i3, use hyprland instead
+  if $FULL; then
+    DESKTOP=$(printf '%s\n' "${DESKTOP[@]}" | grep -v "i3 window manager")
+  fi
 fi
 
 # --- Category: Development ---
@@ -281,11 +285,33 @@ install_apt "${APT_EDIT[@]}"
 
 # --- Desktop (APT) ---
 APT_DESKTOP=()
+HYPRLAND_SELECTED=false
 for item in "${DESKTOP[@]}"; do
   case $item in
-    "i3 window manager")  APT_DESKTOP+=(i3 i3blocks) ;;
+    "i3 window manager")
+      warn "i3 is deprecated — use hyprland instead"
+      APT_DESKTOP+=(i3 i3blocks) ;;
     "rofi launcher")      APT_DESKTOP+=(rofi) ;;
+    "eww widgets")        APT_DESKTOP+=(libgtk-3-dev) ;;
     "waybar")             APT_DESKTOP+=(waybar) ;;
+    "hyprland")
+      HYPRLAND_SELECTED=true
+      APT_DESKTOP+=(
+        hyprland hyprpaper hyprlock hypridle
+        sddm swaync
+        pipewire pipewire-pulse pipewire-audio wireplumber pavucontrol
+        network-manager-gnome blueman
+        cups system-config-printer
+        xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
+        grim slurp swappy wl-clipboard
+        wdisplays wlr-randr nwg-look
+        qt5ct qt6ct
+        brightnessctl playerctl
+        upower power-profiles-daemon
+        thunar gvfs thunar-volman udisks2
+        fonts-font-awesome
+        policykit-1-gnome
+      ) ;;
     "screenshot tools (maim, scrot, grim, slurp)")
       APT_DESKTOP+=(maim scrot grim slurp) ;;
   esac
@@ -504,9 +530,9 @@ for item in "${DESKTOP[@]}"; do
     "hyprland")
       if ! command -v Hyprland &>/dev/null; then
         if [[ "$ID" == ubuntu ]]; then
-          sudo add-apt-repository -y ppa:hyprland/ppa
+          spinner "Adding Hyprland PPA..." \
+            "sudo add-apt-repository -y ppa:hyprland/ppa && sudo apt-get update -qq"
         fi
-        install_apt hyprland
       fi
       ;;
     "eww widgets")
@@ -516,6 +542,33 @@ for item in "${DESKTOP[@]}"; do
       ;;
   esac
 done
+
+# Post-APT Hyprland setup: enable services
+if $HYPRLAND_SELECTED; then
+  # sddm as default display manager
+  if ! systemctl is-enabled sddm &>/dev/null; then
+    sudo systemctl enable sddm 2>/dev/null && ok "  ✓ sddm enabled"
+  fi
+  # User-level services
+  systemctl --user enable --now pipewire pipewire-pulse wireplumber 2>/dev/null || true
+  # Bluetooth
+  if ! systemctl is-enabled bluetooth &>/dev/null; then
+    sudo systemctl enable bluetooth 2>/dev/null && ok "  ✓ bluetooth enabled"
+  fi
+  # Printers
+  if ! systemctl is-enabled cups &>/dev/null; then
+    sudo systemctl enable cups 2>/dev/null && ok "  ✓ cups enabled"
+  fi
+  # Power profiles
+  if ! systemctl is-enabled power-profiles-daemon &>/dev/null; then
+    sudo systemctl enable --now power-profiles-daemon 2>/dev/null || true
+  fi
+  # Start sddm now (only if not already running a display server)
+  if ! systemctl is-active sddm &>/dev/null; then
+    sudo systemctl start sddm 2>/dev/null || true
+  fi
+  ok "  ✓ Hyprland desktop stack ready"
+fi
 
 # ── Stow ─────────────────────────────────────────────────────────────
 step 6 "$TOTAL_STEPS" "Dotfiles (stow)"
