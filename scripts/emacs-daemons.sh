@@ -97,10 +97,51 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
+# ── Helper: flavor → repo URL ──────────────────────────────────────
+repo_of() {
+  case "$1" in
+    centaur)  echo "https://github.com/seagle0128/.emacs.d" ;;
+    crafted)  echo "https://github.com/SystemCrafters/crafted-emacs" ;;
+    doom)     echo "https://github.com/doomemacs/doomemacs" ;;
+    spacemacs) echo "https://github.com/syl20bnr/spacemacs" ;;
+    firemacs) echo "https://github.com/MarcoSantana/emacs" ;;
+    vanilla)  echo "" ;;
+  esac
+}
+dir_of() {
+  case "$1" in
+    centaur)  echo "$HOME/.emacs.d.centaur" ;;
+    crafted)  echo "$HOME/.emacs.d.crafted" ;;
+    doom)     echo "$HOME/.emacs.d" ;;
+    spacemacs) echo "$HOME/.emacs.d.spacemacs" ;;
+    firemacs) echo "$HOME/.emacs.d.firemacs" ;;
+    vanilla)  echo "$HOME/.emacs.d" ;;
+  esac
+}
+
+# ── clone-only action (used by bootstrap.sh for parallel clones) ──
+if [[ "$1" == "clone-only" ]]; then
+  flavor="$2"
+  case "$flavor" in
+    doom) clone_doom ;;
+    *)
+      dir=$(dir_of "$flavor")
+      [[ -d "$dir" ]] && { SKIP "$flavor already cloned at $dir"; exit 0; }
+      repo=$(repo_of "$flavor")
+      clone_config "$flavor" "$repo" "$dir"
+      ;;
+  esac
+  exit 0
+fi
+
 for flavor in "$@"; do
   case "$flavor" in
     --help|-h)
-      echo "Usage: $0 [--list | flavor ...]"
+      echo "Usage: $0 [--list | clone-only FLAVOR | FLAVOR ...]"
+      echo "  clone-only FLAVOR  Clone repo only (no service, no daemon)"
+      echo "  --list             List installed flavors"
+      echo ""
+      echo "Flavors:"
       echo "  centaur   https://github.com/seagle0128/.emacs.d"
       echo "  crafted   https://github.com/SystemCrafters/crafted-emacs"
       echo "  doom      https://github.com/doomemacs/doomemacs"
@@ -119,49 +160,24 @@ for flavor in "$@"; do
       done
       exit 0
       ;;
-    centaur)
-      clone_config "Centaur Emacs" \
-        "https://github.com/seagle0128/.emacs.d" \
-        "$HOME/.emacs.d.centaur"
-      install_service "Centaur" "$HOME/.emacs.d.centaur" "centaur"
-      enable_daemon "centaur"
-      ;;
-    crafted)
-      clone_config "Crafted Emacs" \
-        "https://github.com/SystemCrafters/crafted-emacs" \
-        "$HOME/.emacs.d.crafted"
-      install_service "Crafted" "$HOME/.emacs.d.crafted" "crafted"
-      enable_daemon "crafted"
-      ;;
-    doom)
-      clone_doom
-      install_service "Doom" "$HOME/.emacs.d" "doom"
-      enable_daemon "doom"
-      ;;
-    spacemacs)
-      clone_config "Spacemacs" \
-        "https://github.com/syl20bnr/spacemacs" \
-        "$HOME/.emacs.d.spacemacs"
-      install_service "Spacemacs" "$HOME/.emacs.d.spacemacs" "spacemacs"
-      enable_daemon "spacemacs"
-      ;;
-    firemacs)
-      clone_config "Firemacs" \
-        "https://github.com/MarcoSantana/emacs" \
-        "$HOME/.emacs.d.firemacs"
-      install_service "Firemacs" "$HOME/.emacs.d.firemacs" "firemacs"
-      # Firemacs needs nvm in PATH
-      local nvm_node
-      nvm_node="$(find "$HOME/.nvm/versions/node" -maxdepth 2 -name bin -type d 2>/dev/null | head -1)"
-      if [[ -n "$nvm_node" ]]; then
-        sed -i "/^ExecStart/i\\Environment=PATH=${nvm_node}:/usr/local/bin:/usr/bin:/bin" \
-          "$SERVICE_DIR/emacs-firemacs.service"
+    centaur|crafted|doom|spacemacs|firemacs|vanilla)
+      dir=$(dir_of "$flavor")
+      repo=$(repo_of "$flavor")
+      if [[ "$flavor" != "doom" && "$flavor" != "vanilla" ]]; then
+        clone_config "$flavor" "$repo" "$dir"
+      elif [[ "$flavor" == "doom" ]]; then
+        clone_doom
       fi
-      enable_daemon "firemacs"
-      ;;
-    vanilla)
-      install_service "Vanilla" "$HOME/.emacs.d" "vanilla"
-      enable_daemon "vanilla"
+      install_service "$flavor" "$dir" "$flavor"
+      # Firemacs needs nvm in PATH
+      if [[ "$flavor" == "firemacs" ]]; then
+        nvm_node="$(find "$HOME/.nvm/versions/node" -maxdepth 2 -name bin -type d 2>/dev/null | head -1)"
+        if [[ -n "$nvm_node" ]]; then
+          sed -i "/^ExecStart/i\\Environment=PATH=${nvm_node}:/usr/local/bin:/usr/bin:/bin" \
+            "$SERVICE_DIR/emacs-firemacs.service"
+        fi
+      fi
+      enable_daemon "$flavor"
       ;;
     *)
       FAIL "Unknown flavor: $flavor"

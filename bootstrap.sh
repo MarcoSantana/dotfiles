@@ -7,13 +7,27 @@ set -euo pipefail
 
 DOTFILES="$HOME/dotfiles"
 DRY_RUN=false
+FULL=false
+MINIMAL=false
+START=$SECONDS
 
 # ── Parse args ───────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
-  case $1 in --dry-run) DRY_RUN=true ;; --help|-h)
-    echo "Usage: $0 [--dry-run]"; exit 0 ;;
-  *) echo "Unknown: $1"; exit 1 ;; esac; shift
+  case $1 in
+    --full)    FULL=true ;;
+    --minimal) FULL=true; MINIMAL=true ;;
+    --dry-run) DRY_RUN=true ;;
+    --help|-h)
+      echo "Usage: $0 [--full|--minimal|--dry-run]"
+      echo "  --full     Install everything, no prompts (walk away)"
+      echo "  --minimal  Core + terminal tools + stow only"
+      echo "  --dry-run  Show what would be done"
+      exit 0 ;;
+    *) echo "Unknown: $1"; exit 1 ;;
+  esac; shift
 done
+
+FAILURES=()
 
 run() {
   if $DRY_RUN; then echo "[DRY-RUN] $*"; else "$@"; fi
@@ -38,6 +52,14 @@ fail()      { gum style --foreground 196 "$1"; exit 1; }
 prompt()    { gum input --placeholder "$1" --value "${2:-}" --width 60; }
 confirm()   { gum confirm --affirmative "Yes" --negative "No" "$1"; }
 spinner()   { gum spin --spinner dot --title "$1" -- "$2"; }
+step()      { gum style --foreground 33 "[$1/$2]${3:+ $3}"; }
+
+# ── Auto-selection for --full / --minimal ────────────────────────────
+if $FULL; then
+  choose() { printf '%s\n' "${@:2}"; }
+  confirm() { return 0; }
+  prompt()  { echo "${2:-}"; }
+fi
 
 # ── Preflight ────────────────────────────────────────────────────────
 header "Preflight"
@@ -105,39 +127,49 @@ SHELL_ITEMS=$(choose "Shell tools" \
   "shellcheck,shfmt")
 
 # --- Category: Editors ---
-subheader "Editors"
-EDITORS=$(choose "Pick your weapons" \
-  "neovim" \
-  "helix" \
-  "zed" \
-  "emacs (centaur)" \
-  "emacs (crafted)" \
-  "emacs (doom)" \
-  "emacs (firemacs)" \
-  "emacs (spacemacs)" \
-  "vim")
+if ! $MINIMAL; then
+  subheader "Editors"
+  EDITORS=$(choose "Pick your weapons" \
+    "neovim" \
+    "helix" \
+    "zed" \
+    "emacs (centaur)" \
+    "emacs (crafted)" \
+    "emacs (doom)" \
+    "emacs (firemacs)" \
+    "emacs (spacemacs)" \
+    "vim")
+  # --full: only install the flavors worth keeping
+  if $FULL; then
+    EDITORS=$(printf '%s\n' "emacs (doom)" "emacs (firemacs)" "emacs (spacemacs)")
+  fi
+fi
 
 # --- Category: Desktop / WM ---
-subheader "Desktop / Window Manager"
-DESKTOP=$(choose "Desktop components" \
-  "i3 window manager" \
-  "rofi launcher" \
-  "eww widgets" \
-  "waybar" \
-  "hyprland" \
-  "screenshot tools (maim, scrot, grim, slurp)")
+if ! $MINIMAL; then
+  subheader "Desktop / Window Manager"
+  DESKTOP=$(choose "Desktop components" \
+    "i3 window manager" \
+    "rofi launcher" \
+    "eww widgets" \
+    "waybar" \
+    "hyprland" \
+    "screenshot tools (maim, scrot, grim, slurp)")
+fi
 
 # --- Category: Development ---
-subheader "Development"
-DEV=$(choose "Dev tooling" \
-  "nvm (node version manager)" \
-  "mise (runtime version manager)" \
-  "podman + podman-docker" \
-  "docker.io" \
-  "clojure tools (clj-kondo, cljfmt)" \
-  "stylelint, js-beautify, tidy" \
-  "language servers (clojure-lsp, tinymist, luau)" \
-  "npm globals (vue-language-server, pi-agent, typescript-language-server)")
+if ! $MINIMAL; then
+  subheader "Development"
+  DEV=$(choose "Dev tooling" \
+    "nvm (node version manager)" \
+    "mise (runtime version manager)" \
+    "podman + podman-docker" \
+    "docker.io" \
+    "clojure tools (clj-kondo, cljfmt)" \
+    "stylelint, js-beautify, tidy" \
+    "language servers (clojure-lsp, tinymist, luau)" \
+    "npm globals (vue-language-server, pi-agent, typescript-language-server)")
+fi
 
 # --- Category: Dotfiles (Stow) ---
 header "Dotfiles (Stow packages)"
@@ -150,32 +182,40 @@ for d in "$DOTFILES"/*/; do
 done
 
 STOW_SELECTED=()
-while IFS= read -r line; do
-  STOW_SELECTED+=("$line")
-done < <(
-  gum choose --no-limit \
-    --header "Which configs to stow? (↑↓ navigate, space toggle, enter confirm)" \
-    --cursor "➜ " \
-    --selected-prefix "✓ " \
-    --unselected-prefix "• " \
-    "${AVAILABLE_STOW[@]}"
-)
+if $FULL; then
+  STOW_SELECTED=("${AVAILABLE_STOW[@]}")
+else
+  while IFS= read -r line; do
+    STOW_SELECTED+=("$line")
+  done < <(
+    gum choose --no-limit \
+      --header "Which configs to stow? (↑↓ navigate, space toggle, enter confirm)" \
+      --cursor "➜ " \
+      --selected-prefix "✓ " \
+      --unselected-prefix "• " \
+      "${AVAILABLE_STOW[@]}"
+  )
+fi
 
 if [[ ${#STOW_SELECTED[@]} -eq 0 ]]; then
   warn "No stow packages selected — skipping dotfiles deployment."
 fi
 
 # ── Confirmation ─────────────────────────────────────────────────────
-header "Summary"
-echo
-gum style --foreground 212 "Core:    $(IFS=,; echo "${CORE[*]}" | tr '\n' ' ')"
-gum style --foreground 212 "Shell:   $(IFS=,; echo "${SHELL_ITEMS[*]}" | tr '\n' ' ')"
-gum style --foreground 212 "Editors: $(IFS=,; echo "${EDITORS[*]}" | tr '\n' ' ')"
-gum style --foreground 212 "Desktop: $(IFS=,; echo "${DESKTOP[*]}" | tr '\n' ' ')"
-gum style --foreground 212 "Dev:     $(IFS=,; echo "${DEV[*]}" | tr '\n' ' ')"
-gum style --foreground 212 "Stow:    ${STOW_SELECTED[*]}"
-echo
-confirm "Proceed with install?" || exit 1
+if $FULL; then
+  gum style --foreground 42 "⏩ Full install — proceeding..."
+else
+  header "Summary"
+  echo
+  gum style --foreground 212 "Core:    $(IFS=,; echo "${CORE[*]}" | tr '\n' ' ')"
+  gum style --foreground 212 "Shell:   $(IFS=,; echo "${SHELL_ITEMS[*]}" | tr '\n' ' ')"
+  gum style --foreground 212 "Editors: $(IFS=,; echo "${EDITORS[*]}" | tr '\n' ' ')"
+  gum style --foreground 212 "Desktop: $(IFS=,; echo "${DESKTOP[*]}" | tr '\n' ' ')"
+  gum style --foreground 212 "Dev:     $(IFS=,; echo "${DEV[*]}" | tr '\n' ' ')"
+  gum style --foreground 212 "Stow:    ${STOW_SELECTED[*]}"
+  echo
+  confirm "Proceed with install?" || exit 1
+fi
 
 # ── APT Install ──────────────────────────────────────────────────────
 install_apt() {
@@ -190,11 +230,14 @@ install_apt() {
 
 header "Installation"
 
+TOTAL_STEPS=8
+
 # Update once
 export DEBIAN_FRONTEND=noninteractive
 spinner "Updating package lists..." "sudo apt-get update -qq"
 
 # --- Core ---
+step 1 "$TOTAL_STEPS" "System packages"
 APT_CORE=()
 for item in "${CORE[@]}"; do
   case $item in
@@ -261,24 +304,31 @@ done
 install_apt "${APT_DEV[@]}"
 
 # ── Modern CLI Tools (non-APT) ───────────────────────────────────────
+step 2 "$TOTAL_STEPS" "Shell tools"
 install_deb() {
   local name=$1 url=$2
-  command -v "$name" &>/dev/null && { ok "$name already installed"; return; }
-  local tmp; tmp=$(mktemp -d); local rc=0
-  curl -fsSL "$url" -o "$tmp/pkg.deb" && sudo dpkg -i "$tmp/pkg.deb" || rc=1
-  if [[ $rc -ne 0 ]]; then warn "Failed: $name"; fi
+  command -v "$name" &>/dev/null && { ok "$name already installed"; return 0; }
+  local tmp; tmp=$(mktemp -d)
+  if curl -fsSL "$url" -o "$tmp/pkg.deb" && sudo dpkg -i "$tmp/pkg.deb"; then
+    ok "$name installed"; local rc=0
+  else
+    warn "Failed: $name"; local rc=1
+  fi
   rm -rf "$tmp"
+  return $rc
 }
 
 for item in "${SHELL_ITEMS[@]}"; do
   case $item in
     "eza (modern ls)")
       install_deb "eza" \
-        "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.deb"
+        "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.deb" \
+        || FAILURES+=("eza")
       ;;
     "bat (modern cat)")
       install_deb "bat" \
-        "https://github.com/sharkdp/bat/releases/latest/download/bat-musl_amd64.deb"
+        "https://github.com/sharkdp/bat/releases/latest/download/bat-musl_amd64.deb" \
+        || FAILURES+=("bat")
       ;;
     "starship prompt")
       if ! command -v starship &>/dev/null; then
@@ -294,11 +344,12 @@ for item in "${SHELL_ITEMS[@]}"; do
       ;;
     "fastfetch")
       install_deb "fastfetch" \
-        "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb"
+        "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb" \
+        || FAILURES+=("fastfetch")
       ;;
     "grip (markdown preview)")
       if ! command -v grip &>/dev/null; then
-        pip install --user --break-system-packages grip
+        pip install --user --break-system-packages grip || FAILURES+=("grip")
       fi
       ;;
     "oh-my-zsh")
@@ -311,6 +362,7 @@ for item in "${SHELL_ITEMS[@]}"; do
 done
 
 # --- Editors (non-APT) ---
+step 3 "$TOTAL_STEPS" "Editors"
 EMACS_SELECTED=()
 for item in "${EDITORS[@]}"; do
   case $item in
@@ -355,6 +407,13 @@ if [[ ${#EMACS_SELECTED[@]} -gt 0 ]]; then
   if ! command -v emacs &>/dev/null; then
     install_apt emacs
   fi
+  # Parallel clones
+  pids=()
+  for flavor in "${EMACS_SELECTED[@]}"; do
+    ("$DOTFILES/scripts/emacs-daemons.sh" clone-only "$flavor") & pids+=($!)
+  done
+  wait "${pids[@]}" || true
+  # Then create services + start daemons (sequential, fast)
   "$DOTFILES/scripts/emacs-daemons.sh" "${EMACS_SELECTED[@]}"
 fi
 
@@ -364,6 +423,7 @@ if command -v ya &>/dev/null; then
 fi
 
 # --- Dev (non-APT) ---
+step 4 "$TOTAL_STEPS" "Dev tooling & language servers"
 for item in "${DEV[@]}"; do
   case $item in
     "nvm (node version manager)")
@@ -392,13 +452,13 @@ for item in "${DEV[@]}"; do
       # clojure-lsp — binary install
       if ! command -v clojure-lsp &>/dev/null; then
         spinner "Installing clojure-lsp..." \
-          "curl -fsSL https://github.com/clojure-lsp/clojure-lsp/releases/latest/download/clojure-lsp-native-linux-amd64.zip -o /tmp/clojure-lsp.zip && unzip -o /tmp/clojure-lsp.zip -d /tmp && sudo mv /tmp/clojure-lsp /usr/local/bin/ && rm -f /tmp/clojure-lsp.zip"
+          "curl -fsSL https://github.com/clojure-lsp/clojure-lsp/releases/latest/download/clojure-lsp-native-linux-amd64.zip -o /tmp/clojure-lsp.zip && unzip -o /tmp/clojure-lsp.zip -d /tmp && sudo mv /tmp/clojure-lsp /usr/local/bin/ && rm -f /tmp/clojure-lsp.zip" \
+          || FAILURES+=("clojure-lsp")
       fi
       # tinymist (Typst LSP) — cargo or prebuilt
       if ! command -v tinymist &>/dev/null; then
         if command -v cargo &>/dev/null; then
-          spinner "Installing tinymist (Typst LSP)..." \
-            "cargo install tinymist"
+          cargo install tinymist || FAILURES+=("tinymist")
         else
           warn "tinymist requires Rust — install via: cargo install tinymist"
         fi
@@ -406,7 +466,8 @@ for item in "${DEV[@]}"; do
       # luau-lsp
       if ! command -v luau-lsp &>/dev/null; then
         spinner "Installing luau-lsp..." \
-          "curl -fsSL https://github.com/luau-lang/luau/releases/latest/download/luau-ubuntu-x86_64.zip -o /tmp/luau.zip && unzip -o /tmp/luau.zip -d /tmp && sudo mv /tmp/luau-lsp /usr/local/bin/ && rm -f /tmp/luau.zip"
+          "curl -fsSL https://github.com/luau-lang/luau/releases/latest/download/luau-ubuntu-x86_64.zip -o /tmp/luau.zip && unzip -o /tmp/luau.zip -d /tmp && sudo mv /tmp/luau-lsp /usr/local/bin/ && rm -f /tmp/luau.zip" \
+          || FAILURES+=("luau-lsp")
       fi
       ;;
     "npm globals (vue-language-server, pi-agent, typescript-language-server)")
@@ -416,13 +477,13 @@ for item in "${DEV[@]}"; do
         [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh" || true
         command -v vue-language-server &>/dev/null || \
           spinner "Installing @vue/language-server..." \
-            "npm install -g @vue/language-server"
+            "npm install -g @vue/language-server" || FAILURES+=("vue-language-server")
         command -v typescript-language-server &>/dev/null || \
           spinner "Installing typescript-language-server..." \
-            "npm install -g typescript-language-server"
+            "npm install -g typescript-language-server" || FAILURES+=("typescript-language-server")
         command -v pi &>/dev/null || \
           spinner "Installing Pi AI coding agent..." \
-            "npm install -g @earendil-works/pi-coding-agent"
+            "npm install -g @earendil-works/pi-coding-agent" || FAILURES+=("pi-agent")
       else
         warn "npm not found — install npm globals manually"
       fi
@@ -437,6 +498,7 @@ for item in "${DEV[@]}"; do
 done
 
 # --- Desktop (non-APT) ---
+step 5 "$TOTAL_STEPS" "Desktop / WM"
 for item in "${DESKTOP[@]}"; do
   case $item in
     "hyprland")
@@ -456,6 +518,7 @@ for item in "${DESKTOP[@]}"; do
 done
 
 # ── Stow ─────────────────────────────────────────────────────────────
+step 6 "$TOTAL_STEPS" "Dotfiles (stow)"
 header "Deploying Dotfiles"
 
 for pkg in "${STOW_SELECTED[@]}"; do
@@ -477,6 +540,7 @@ for f in bashrc bash_profile gitconfig vimrc kakrc; do
 done
 
 # ── Post-install tweaks ──────────────────────────────────────────────
+step 7 "$TOTAL_STEPS" "Post-install"
 header "Post-Install"
 
 # Caps Lock → Ctrl (GNOME)
@@ -486,12 +550,27 @@ fi
 
 # Restart emacs daemons after stow (stow may replace service files)
 for flavor in "${EMACS_SELECTED[@]}"; do
-  local svc="emacs-${flavor}"
+  svc="emacs-${flavor}"
   if systemctl --user is-enabled "$svc" &>/dev/null; then
     systemctl --user daemon-reload 2>/dev/null
     systemctl --user restart "$svc" 2>/dev/null && ok "  ✓ $svc restarted" || true
   fi
 done
+
+# Nerd Font (--full only)
+if $FULL; then
+  step 7 "$TOTAL_STEPS" "Nerd Font"
+  FONT_DIR="$HOME/.local/share/fonts"
+  mkdir -p "$FONT_DIR"
+  if ls "$FONT_DIR"/FiraCodeNerdFont* &>/dev/null 2>&1; then
+    ok "  ✓ FiraCode Nerd Font already installed"
+  else
+    spinner "Installing FiraCode Nerd Font..." \
+      "curl -fsSL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.tar.xz \
+        | tar xJ -C '$FONT_DIR' 2>/dev/null && fc-cache -f '$FONT_DIR'"
+    ok "  ✓ FiraCode Nerd Font"
+  fi
+fi
 
 # Podman socket
 if command -v podman &>/dev/null && confirm "Enable podman rootless socket?"; then
@@ -504,6 +583,22 @@ if command -v zsh &>/dev/null && [[ "$SHELL" != "$(command -v zsh)" ]] && confir
 fi
 
 # ── Done ─────────────────────────────────────────────────────────────
+DURATION=$((SECONDS - START))
 header "Done"
-gum style --foreground 42 --padding "0 2" \
-  "Bootstrap complete! Restart your shell: exec \$SHELL"
+if $FULL; then
+  gum style --border double --padding "1 2" \
+    "Bootstrap complete in ${DURATION}s"
+  if [[ ${#FAILURES[@]} -gt 0 ]]; then
+    gum style --foreground 220 "Completed with ${#FAILURES[@]} failure(s):"
+    for f in "${FAILURES[@]}"; do
+      gum style --foreground 196 "  ✗ $f"
+    done
+    echo
+    gum style --foreground 220 "Re-run individual installers: ~/dotfiles/scripts/*.sh"
+  else
+    gum style --foreground 42 "All steps completed successfully."
+  fi
+else
+  gum style --foreground 42 --padding "0 2" \
+    "Bootstrap complete! Restart your shell: exec \$SHELL"
+fi

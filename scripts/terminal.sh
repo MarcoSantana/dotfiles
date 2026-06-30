@@ -86,6 +86,11 @@ detect_distro
 INFO "Detected: $DISTRO ($PKG_MGR)"
 
 case "$1" in
+  --help|-h)
+    echo "Usage: $0 [--minimal|--full]"
+    echo "  --minimal  Essential terminal tools only"
+    echo "  --full     Full terminal tooling (default)"
+    exit 0 ;;
   --minimal) MODE="minimal" ;;
   --full)    MODE="full" ;;
   *)         MODE="full" ;;
