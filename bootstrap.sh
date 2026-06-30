@@ -16,12 +16,29 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     --full)    FULL=true ;;
     --minimal) FULL=true; MINIMAL=true ;;
+    --list|-l)
+      echo "Available categories (use with --full or manual TUI selection):"
+      echo ""
+      echo "  TERMINAL:  gui tools, zsh-fzf, tmux plugins, oh-my-zsh"
+      echo "  EDITORS:   helix, zed, emacs (doom/firemacs/spacemacs)"
+      echo "  DEV:       nvm, clojure tools, language servers (clojure-lsp,"
+      echo "             tinymist, luau-lsp), npm globals (vue-language-server,"
+      echo "             pi-agent, typescript-language-server), mise"
+      echo "  DESKTOP:   hyprland (full stack: sddm, swaync, pipewire,"
+      echo "             nm-applet, blueman, cups, xdg-desktop-portal-hyprland,"
+      echo "             grim+slurp+swappy, wl-clipboard+cliphist, wdisplays,"
+      echo "             nwg-look, qt5ct/6ct, brightnessctl, playerctl, upower,"
+      echo "             thunar+gvfs, fonts-font-awesome, polkit-gnome),"
+      echo "             eww widgets"
+      echo "  THEMING:   stow (symlinks all dotfiles), nerd font"
+      exit 0 ;;
     --dry-run) DRY_RUN=true ;;
     --help|-h)
-      echo "Usage: $0 [--full|--minimal|--dry-run]"
+      echo "Usage: $0 [--full|--minimal|--dry-run|--list]"
       echo "  --full     Install everything, no prompts (walk away)"
       echo "  --minimal  Core + terminal tools + stow only"
       echo "  --dry-run  Show what would be done"
+      echo "  --list     Show installable categories"
       exit 0 ;;
     *) echo "Unknown: $1"; exit 1 ;;
   esac; shift
@@ -633,6 +650,17 @@ fi
 # Default shell → zsh
 if command -v zsh &>/dev/null && [[ "$SHELL" != "$(command -v zsh)" ]] && confirm "Change default shell to zsh?"; then
   chsh -s "$(command -v zsh)" && ok "  ✓ default shell → zsh"
+fi
+
+# Git hooks
+if [[ -d "$DOTFILES/.githooks" ]]; then
+  git config core.hooksPath "$DOTFILES/.githooks" 2>/dev/null && ok "  ✓ git hooks configured"
+fi
+
+# dotfiles CLI
+mkdir -p "$HOME/.local/bin"
+if [[ ! -L "$HOME/.local/bin/dotfiles" ]]; then
+  ln -sf "$DOTFILES/scripts/dotfiles.sh" "$HOME/.local/bin/dotfiles" && ok "  ✓ dotfiles CLI → ~/.local/bin/dotfiles"
 fi
 
 # ── Done ─────────────────────────────────────────────────────────────

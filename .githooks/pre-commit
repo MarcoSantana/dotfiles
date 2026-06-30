@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Pre-commit hook: validate bash syntax on staged .sh files
+set -euo pipefail
+
+errors=()
+while IFS= read -r f; do
+  if ! bash -n "$f" 2>/dev/null; then
+    errors+=("$f")
+  fi
+done < <(git diff --cached --name-only --diff-filter=AM | grep '\.sh$' || true)
+
+if [[ ${#errors[@]} -gt 0 ]]; then
+  echo "✗ Bash syntax error(s) in:" >&2
+  printf '  %s\n' "${errors[@]}" >&2
+  exit 1
+fi
