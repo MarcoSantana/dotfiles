@@ -301,6 +301,10 @@ if [[ $# -eq 0 ]]; then
       THEME_KEY="solarized $VARIANT"
       ;;
   esac
+elif [[ "$1" == "--list" || "$1" == "-l" ]]; then
+  echo "Available themes:"
+  for t in "${THEME_ORDER[@]}"; do echo "  $t ($(source "$THEMES_DIR/${THEMES[$t]}" 2>/dev/null && echo "$TH_NAME"))"; done
+  exit 0
 elif [[ "$1" == "next" ]]; then
   # Cycle to next theme
   CURRENT_THEME=""
@@ -321,6 +325,12 @@ if [[ -z "$THEME_KEY" || -z "${THEMES[$THEME_KEY]:-}" ]]; then
   warn "Unknown theme. Available:"
   for t in "${!THEMES[@]}"; do echo "  $t"; done
   exit 1
+fi
+
+# Self-install: ensure available in PATH as 'theme-switch'
+if [[ ! -L "$HOME/.local/bin/theme-switch" ]]; then
+  mkdir -p "$HOME/.local/bin"
+  ln -sf "$DOTFILES/scripts/theme-switch.sh" "$HOME/.local/bin/theme-switch"
 fi
 
 header "🎨 $THEME_KEY"
