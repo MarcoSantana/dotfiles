@@ -13,6 +13,8 @@ C = ":bca"
 x = ":bc"
 # Add comma to the end of the line
 "," = [
+
+
     "save_selection",
     "goto_line_end",
     ":append-output printf ','",
@@ -64,13 +66,30 @@ newline = "all"
 tab = "→"
 [editor.soft-wrap]
 enable = true
+wrap-indicator = "↪ "
+
 
   
 [keys.normal]
 esc = ["collapse_selection", "keep_primary_selection", ":w"] # remove additional cursors and selections
-# 
+z = { z = [":write", ":quit"] } # zz to save and exit
+
+[keys.insert]
+"A-d" = ["move_next_word_end", "delete_selection"]     # Emacs Alt+d (delete next word)
+"C-k" = ["kill_to_line_end"]                           # Emacs Ctrl+k (kill line to end)
+"C-a" = ["goto_line_start"]                            # Emacs Ctrl+a (home)
+"C-e" = ["goto_line_end_newline"]                      # Emacs Ctrl+e (end)
+"C-y" = ["paste_after"]                                # Emacs Ctrl+y (yank/paste)
+
+
 # "\\" is how to use \ as the beginning of a mapping,
 # and so this is a subtable of keys.normal for \
 [keys.normal."\\"]
 c = ":bc"
 g = "goto_file"
+t = ":theme "
+";" = "toggle_comments"                                # Emacs M-; style comment toggle
+"\\" = "toggle_comments"                               # Double backslash to toggle comments
+
+
+

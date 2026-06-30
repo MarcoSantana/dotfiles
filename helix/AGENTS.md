@@ -1,12 +1,16 @@
 # Helix Config
 
-Personal Helix editor configuration. Not a git repo.
+Personal Helix editor configuration. Stow-managed in `~/dotfiles/`.
 
 ## Structure
 
 - `config.toml` — editor settings, keybindings
 - `languages.toml` — LSP configs per language
 - `themes/gruvbox.toml` — custom gruvbox dark palette theme
+
+## Stow
+
+Runs from `~/dotfiles/` via `stow helix`. Live config at `~/.config/helix` is a symlink to `~/dotfiles/helix/.config/helix/`.
 
 ## Keybindings (space leader)
 
@@ -18,6 +22,7 @@ Personal Helix editor configuration. Not a git repo.
 | `=`     | `:format`     |
 | `c`     | `:bc`         |
 | `C`     | `:bca`        |
+| `x`     | `:bc`         |
 | `,`     | append `,`    |
 | `;`     | append `;`    |
 | `\ c`   | `:bc`         |

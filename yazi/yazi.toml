@@ -13,3 +13,6 @@ image_height = 30
 border = "rounded"
 underline = true
 render_image = true
+
+[editor]
+default = "nvim"
