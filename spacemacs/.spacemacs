@@ -822,17 +822,16 @@ before packages are loaded."
          "*lustre-build*")))
 
     ;; ── Extra keybindings (major-mode leader is `,`) ──
+    ;; NOTE: The gleam layer already binds `cb` (build), `cc` (run),
+    ;;       `ta` (test all), `==` (format), `T=` (toggle format-on-save).
+    ;;       We add extras below.  Use `==` for format (not `=` alone,
+    ;;       because `=` is declared as a prefix key by the layer).
     (spacemacs/set-leader-keys-for-major-mode 'gleam-ts-mode
-      "cc"  'spacemacs//gleam-run
-      "cb"  'spacemacs//gleam-build
       "ck"  'my/gleam-check
       "cd"  'my/gleam-docs
       "cD"  'my/gleam-docs-build
-      "ta"  'spacemacs//gleam-test-project
       "tf"  'my/gleam-toggle-test-file
-      "="   'gleam-ts-format
       "=p"  'my/gleam-format-project
-      "T="  'spacemacs//gleam-toggle-format-on-save
       "np"  'my/gleam-new-project
       "ad"  'my/gleam-add-dependency
       "ld"  'my/gleam-lustre-dev
