@@ -68,12 +68,18 @@ warn()      { gum style --foreground 220 "$1"; }
 fail()      { gum style --foreground 196 "$1"; exit 1; }
 prompt()    { gum input --placeholder "$1" --value "${2:-}" --width 60; }
 confirm()   { gum confirm --affirmative "Yes" --negative "No" "$1"; }
-spinner()   { gum spin --spinner dot --title "$1" -- "$2"; }
+spinner()   {
+  if $FULL; then
+    gum style --foreground 33 "  → $1"
+    eval "$2"
+  else
+    gum spin --spinner dot --title "$1" -- "$2"
+  fi
+}
 step()      { gum style --foreground 33 "[$1/$2]${3:+ $3}"; }
 
 # ── Auto-selection for --full / --minimal ────────────────────────────
 if $FULL; then
-  choose() { printf '%s\n' "${@:2}"; }
   confirm() { return 0; }
   prompt()  { echo "${2:-}"; }
 fi
@@ -110,7 +116,11 @@ confirm "Start the bootstrap?" || exit 1
 
 # ── Category selections ──────────────────────────────────────────────
 choose() {
-  gum choose --no-limit --header "$1" --cursor "➜ " --selected-prefix "✓ " --unselected-prefix "• " "${@:2}"
+  if $FULL; then
+    printf '%s\n' "${@:2}"
+  else
+    gum choose --no-limit --header "$1" --cursor "➜ " --selected-prefix "✓ " --unselected-prefix "• " "${@:2}"
+  fi
 }
 
 header "Select what to install"
