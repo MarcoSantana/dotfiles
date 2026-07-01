@@ -4,7 +4,7 @@
 *~
 
 # Bulk data directories
-.local/
+/.local/
 .cache/
 .vscode-oss/
 node_modules/
