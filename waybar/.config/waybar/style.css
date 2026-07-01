@@ -1,0 +1,11 @@
+@import "colors.css";
+* { font-family: "JetBrains Mono Nerd Font", sans-serif; font-size: 13px; }
+window#waybar { background: @bg; color: @fg; }
+#workspaces button { background: @surface; color: @fg; border-radius: 4px; margin: 2px; }
+#workspaces button.active { background: @accent; color: @bg; }
+#clock, #network, #bluetooth, #pulseaudio, #battery, #tray { padding: 0 8px; }
+#clock { color: @accent; }
+#network { color: @green; }
+#pulseaudio { color: @cyan; }
+#battery { color: @green; }
+#battery.critical { color: @red; }
