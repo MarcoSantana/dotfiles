@@ -44,7 +44,13 @@ echo "    swappy:   https://github.com/jtheoof/swappy"
 echo "    nwg-look: https://github.com/nwg-piotr/nwg-look"
 
 echo "=== 3/6 Enable services ==="
-sudo systemctl enable sddm
+# SDDM skipped on live systems (COSMIC greeter already in place).
+# Fresh installs: bootstrap.sh handles sddm enable.
+if ! systemctl is-enabled display-manager &>/dev/null; then
+  sudo systemctl enable sddm
+else
+  echo "  → Display manager already active ($(readlink /etc/systemd/system/display-manager.service 2>/dev/null || echo 'unknown'))"
+fi
 sudo systemctl enable bluetooth
 sudo systemctl enable cups
 sudo systemctl enable power-profiles-daemon
