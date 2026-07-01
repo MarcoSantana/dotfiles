@@ -1,81 +1,91 @@
-# Marco's Dotfiles & NixOS Configuration
+# Marco's Dotfiles
 
-This repository contains my NixOS system configuration, Home Manager settings, and various dotfiles. It is managed with **Nix Flakes** for a reproducible and streamlined experience.
+Dotfiles + bootstrap installer for Ubuntu/Debian → Hyprland desktop.
+Manage configs with GNU Stow, cycle themes system-wide with one command.
 
-## 🚀 Streamlined Installation (The Flux)
+## Quick Start
 
-To install this configuration on a new machine:
-
-1.  **Install NixOS**: Boot from the official ISO and perform the basic install (partitioning and mounting).
-2.  **Clone this repo**:
-    ```bash
-    git clone https://github.com/your-username/dotfiles.git ~/dotfiles
-    ```
-3.  **Run the Bootstrap**:
 ```bash
 cd ~/dotfiles
-    # Recommended: Run a dry run first to verify everything evaluates correctly
-    ./bootstrap.sh --dry-run
-    
-    # If successful, perform the real bootstrap:
-./bootstrap.sh
+./bootstrap.sh --full   # walk-away: everything, no prompts, SDDM at end
+./bootstrap.sh --minimal # core + terminal + stow only
+./bootstrap.sh           # interactive TUI (gum) — pick what you want
 ```
 
-### Bootstrap Flags
-The `bootstrap.sh` script supports several flags for different hardware and maintenance tasks:
-- `--dry-run`: Test the evaluation and build process without applying system changes.
-- `--clean`: Run `nix-collect-garbage` and verify store integrity before building.
-- `--macbook`: Target the MacBook Pro configuration.
-- `--lenovo`: Target the Thinkpad L13 configuration.
-- `--nixos` (default): Target the generic/standard NixOS configuration.
+### On a live system (existing display manager)
 
-## 🛠 Maintenance
-
-To apply changes after editing your configuration:
 ```bash
-# Using the bootstrap script (recommended)
-./bootstrap.sh
-
-# Or using standard nixos-rebuild
-sudo nixos-rebuild switch --flake .#nixos
+./scripts/install-hyprland-stack.sh   # PPA + Hyprland stack + pre-stow backup
+./bootstrap.sh --minimal              # or full, but skip the desktop section
+theme-switch                          # set colors after first Hyprland login
 ```
 
-## ⚠️ Common Gotchas
+### Key scripts (all in `scripts/`)
 
-### 1. Picom Package Issue
-The `picom` package reference in `nixos/home-manager/home.nix` is currently **commented out**. 
-- **Symptom**: Evaluation error stating `picom/package.nix` does not exist.
-- **Why**: An upstream issue in `nixpkgs` (release 25.11) occasionally breaks this specific path.
-- **Fix**: Once `nixpkgs` is updated, you can uncomment that section in `home.nix`.
+| Script | Purpose |
+|---|---|
+| `theme-switch.sh` | Cycle themes system-wide (gum TUI or `theme-switch catppuccin mocha`) |
+| `dotfiles.sh` | CLI: `dotfiles {pull,status,diff,doctor}` — symlinked to `~/.local/bin/dotfiles` |
+| `install-hyprland-stack.sh` | Desktop stack from PPA for live systems with existing DM |
+| `emacs-daemons.sh` | Install/manage Emacs flavor daemons (doom/spacemacs/firemacs) |
+| `emacs-manager` | Gum TUI for Emacs flavor management |
+| `idle-guard.sh` | Media-aware DPMS/lock guard (used by hypridle) |
+| `terminal.sh` | Consolidates terminal tool APT install |
+| `zsh-fzf.sh` | ZSH + FZF setup |
 
-### 2. Hardware Configuration
-The bootstrap script attempts to copy `/etc/nixos/hardware-configuration.nix` to the repository. 
-- **Gotcha**: If you are in a non-NixOS environment (like a Live CD or another distro) or the file is missing, it will warn you.
-- **Fix**: Ensure your partitions are properly mounted and `nixos-generate-config` has been run or manually provide the file.
+## Theme System
 
-### 3. Disk Space
-Nix builds can be storage-intensive.
-- **Gotcha**: If you have less than 5GB of free space, the script will warn you.
-- **Fix**: Run `./bootstrap.sh --clean` or manually delete old generations with `sudo nix-collect-garbage -d`.
+Six themes, controlled by `theme-switch.sh`:
 
-### 4. Flake Lock File
-Always ensure your `flake.lock` is up to date if you change inputs.
+- **catppuccin** — mocha, macchiato
+- **gruvbox** — dark, light
+- **solarized** — dark, light
+
+It writes generated color files for **hyprland**, **waybar**, **swaync**, **kitty**, and **rofi**.
+First-run GTK theme download from Catppuccin GitHub releases (lazy, not in bootstrap).
+
 ```bash
-nix flake update
+theme-switch                    # gum TUI: pick family → variant
+theme-switch catppuccin mocha   # direct CLI
+theme-switch next               # cycle
+theme-switch --list             # show all themes
+theme-switch --dry-run          # preview without writing
 ```
 
-### 5. EFI Mount Route mismatch
-Newer NixOS versions tend to use `/boot` as the EFI mount point, while older ones used `/boot/efi`.
-- **Gotcha**: The bootstrap script will stop if it detects a mismatch between your system and the config.
-- **Fix**: Update `boot.loader.efi.efiSysMountPoint` in your host's `configuration.nix` to match the path detected by the bootstrap script.
+## Stow Packages
 
-### 6. Pulling Updates with Local Changes
-If you have local edits but want to pull the latest version of these dotfiles:
+```
+bash/    doom/    eww/      ghostty/  hypr/    kitty/  nvim/   rofi/    vifm/
+emacs/   firemacs/ git/    helix/    i3/      profile/ spacemacs/ tmux/  yazi/  zed/  zsh/
+```
+
+`dotfiles doctor` checks all stow packages, symlinks, global gitignore/attributes, font, gum, shell, and working tree.
+
+## Desktop (Hyprland)
+
+- Plain `.conf` (no Lua/ML4W)
+- SDDM display manager (fresh install) or COSMIC greeter (live system with session file)
+- Autostarts: waybar, swaync, nm-applet, blueman-applet, polkit-gnome, hyprpaper, hypridle, cliphist, eww
+- NVIDIA GTX 1650 Optimus: `WLR_NO_HARDWARE_CURSORS`, `WLR_DRM_NO_MODIFIERS`, `LIBVA_DRIVER_NAME`, `GBM_BACKEND`, `__GLX_VENDOR_LIBRARY_NAME`
+- Media-aware idle: checks `playerctl` before DPMS/lock
+
+## Emacs Flavors
+
+- **doom**: `~/.doom.d` — gleam-ts-mode + lsp-deferred
+- **spacemacs**: `~/.spacemacs` — gleam layer
+- **firemacs**: `~/.emacs.d.firemacs` — gleam-ts-mode + eglot-ensure
+
+## NVIDIA Notes (HP OMEN 15-dc1xxx)
+
+- Kernel param: `nvidia_drm.modeset=1` (added via `kernelstub`)
+- Env vars in `hyprland.conf` handle the rest
+- Tested with GTX 1650 Mobile — driver 590.48.01
+
+## Maintenance
+
 ```bash
-# Save your changes temporarily
-git stash
-# Pull and re-apply your changes on top of the latest version
-git pull --rebase
-# Bring back your local edits
-git stash pop
+dotfiles pull        # git pull --rebase + submodules
+dotfiles status      # git status
+dotfiles diff [path] # diff with stow-aware defaults
+dotfiles doctor      # full health check (symlinks, stow, font, gum, git configs)
 ```
