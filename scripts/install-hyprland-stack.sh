@@ -9,20 +9,39 @@ sudo apt-get update -qq
 echo "=== 2/6 Install Hyprland + desktop stack ==="
 sudo apt-get install -y \
   hyprland hyprpaper hyprlock hypridle \
-  sddm swaync \
+  sddm \
   pipewire pipewire-pulse pipewire-audio wireplumber pavucontrol \
   network-manager-gnome blueman \
   cups system-config-printer \
   xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
-  grim slurp swappy wl-clipboard \
-  wdisplays wlr-randr nwg-look \
+  grim slurp wl-clipboard \
+  wdisplays wlr-randr \
   qt5ct qt6ct \
   brightnessctl playerctl \
   upower power-profiles-daemon \
   thunar gvfs thunar-volman udisks2 \
   fonts-font-awesome \
   policykit-1-gnome \
-  waybar rofi
+  waybar rofi fuzzel uwsm
+
+echo "=== 2b/6 Optional extras (swaync, swappy, nwg-look) ==="
+# swaync — install via GitHub release
+if ! command -v swaync &>/dev/null; then
+  echo "  → Installing swaync from GitHub..."
+  cd /tmp
+  url=$(curl -fsSL https://api.github.com/repos/ErikReider/SwayNotificationCenter/releases/latest \
+    | grep "browser_download_url.*x86_64-linux-gnu" | cut -d'"' -f4)
+  wget -q "$url" -O swaync.tar.gz && \
+  tar xzf swaync.tar.gz && \
+  sudo install -m755 swaync/swaync /usr/local/bin/ && \
+  rm -rf swaync* && \
+  echo "  ✓ swaync" || echo "  ⚠ swaync install failed"
+fi
+
+# swappy, nwg-look — skipped (build from source or manual install)
+echo "  → swappy and nwg-look not in repos — install manually if needed:"
+echo "    swappy:   https://github.com/jtheoof/swappy"
+echo "    nwg-look: https://github.com/nwg-piotr/nwg-look"
 
 echo "=== 3/6 Enable services ==="
 sudo systemctl enable sddm
