@@ -56,8 +56,17 @@ sudo systemctl enable cups
 sudo systemctl enable power-profiles-daemon
 systemctl --user enable --now pipewire pipewire-pulse wireplumber 2>/dev/null || true
 
-echo "=== 4/6 Apply stow ==="
+echo "=== 4/6 Resolve stow conflicts ==="
 cd ~/dotfiles
+# Back up any real files that stow wants to symlink, so stow doesn't abort
+for link in .zshrc .bashrc .bash_profile .gitconfig .vimrc; do
+  if [[ -f "$HOME/$link" && ! -L "$HOME/$link" ]]; then
+    bak="$HOME/$link.bak.$(date +%s)"
+    mv "$HOME/$link" "$bak" && echo "  → backed up $link → $(basename $bak)"
+  fi
+done
+
+echo "=== 5/6 Apply stow ==="
 stow -R hypr rofi kitty eww git ghostty zsh bash
 mkdir -p ~/.local/bin
 ln -sf ~/dotfiles/scripts/theme-switch.sh ~/.local/bin/theme-switch
@@ -65,7 +74,7 @@ ln -sf ~/dotfiles/scripts/dotfiles.sh ~/.local/bin/dotfiles
 git config core.hooksPath ~/dotfiles/.githooks
 echo "  ✓ Stow applied"
 
-echo "=== 5/5 Verify ==="
+echo "=== 6/6 Verify ==="
 echo ""
 echo "  Hyprland:  $(command -v Hyprland || echo MISSING)"
 echo "  SDDM:      $(systemctl is-enabled sddm 2>/dev/null || echo NOT FOUND)"
