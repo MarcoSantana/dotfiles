@@ -254,11 +254,11 @@ It should only modify the values of Spacemacs settings."
    ;; package can be defined with `:package', or a theme can be defined with
    ;; `:location' to download the theme package, refer the themes section in
    ;; DOCUMENTATION.org for the full theme specifications.
-   dotspacemacs-themes '(gruvbox-dark-hard
-                        tokyo-night
-                        doom-gruvbox
-                        catppuccin
-                        spacemacs-dark)
+    dotspacemacs-themes '(tokyo-night
+                         gruvbox-dark-hard
+                         doom-gruvbox
+                         catppuccin
+                         spacemacs-dark)
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
    ;; first three are spaceline themes. `doom' is the doom-emacs mode-line.
@@ -651,8 +651,8 @@ before packages are loaded."
 
   ;; UI Themes
   (if (display-graphic-p)
-      (spacemacs/load-theme 'gruvbox-dark-hard)
-    (spacemacs/load-theme 'gruvbox-dark-hard))
+      (spacemacs/load-theme 'tokyo-night)
+    (spacemacs/load-theme 'tokyo-night))
 
   ;; ROLLBACK NOTE (2026-05-12): If rolling back, remove everything from here to END MARKDOWN ENHANCEMENTS
   ;; Markdown enhancements - START

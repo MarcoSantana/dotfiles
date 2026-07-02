@@ -1,7 +1,7 @@
 (setq user-full-name "MSantana"
       user-mail-address "msantana@example.com")
 
-(setq doom-theme 'doom-gruvbox)
+(setq doom-theme 'doom-tokyo-night)
 
 ;; Add some subtle transparency if using a compositor (like Pop!_OS's default)
 (set-frame-parameter (selected-frame) 'alpha '(95 . 95))

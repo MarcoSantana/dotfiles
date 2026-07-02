@@ -1,11 +1,69 @@
-@import "colors.css";
-* { font-family: "JetBrains Mono Nerd Font", sans-serif; font-size: 13px; }
-window#waybar { background: @bg; color: @fg; }
-#workspaces button { background: @surface; color: @fg; border-radius: 4px; margin: 2px; }
-#workspaces button.active { background: @accent; color: @bg; }
-#clock, #network, #bluetooth, #pulseaudio, #battery, #tray { padding: 0 8px; }
-#clock { color: @accent; }
-#network { color: @green; }
-#pulseaudio { color: @cyan; }
-#battery { color: @green; }
-#battery.critical { color: @red; }
+* {
+    font-family: "FiraCode Nerd Font";
+    font-size: 13px;
+}
+
+#waybar {
+    background: #1a1b26;
+    color: #c0caf5;
+}
+
+#clock {
+    color: #c0caf5;
+}
+
+#tray {
+    padding-left: 4px;
+}
+
+#workspaces button {
+    color: #565f89;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 0px;
+}
+
+#workspaces button:hover {
+    background-color: #24283b;
+}
+
+#workspaces button.active {
+    color: #7aa2f7;
+}
+
+#window {
+    color: #c0caf5;
+}
+
+#network {
+    color: #7dcfff;
+    margin-right: 8px;
+}
+
+#pulseaudio {
+    color: #9ece6a;
+    margin-right: 4px;
+}
+
+#cpu {
+    color: #7dcfff;
+    margin-right: 4px;
+}
+
+#memory {
+    color: #bb9af7;
+    margin-right: 4px;
+}
+
+#battery {
+    color: #9ece6a;
+    margin-right: 4px;
+}
+
+#battery.critical {
+    color: #f7768e;
+}
+
+#custom-powermenu {
+    color: #f7768e;
+}

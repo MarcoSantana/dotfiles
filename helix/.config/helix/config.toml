@@ -1,7 +1,7 @@
 # Helix configuration
-# Gruvbox theme is set as the default
+# Tokyo Night theme
 
-theme = "gruvbox"
+theme = "tokyonight"
 
 [keys.normal.space]
 q = ":quit"
