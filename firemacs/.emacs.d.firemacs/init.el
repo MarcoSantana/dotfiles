@@ -43,7 +43,7 @@
 ;; ---------------------------------------------------------------------------
 
 (defvar my/init-dir
-  (file-name-directory (file-truename (or load-file-name buffer-file-name)))
+  (file-name-directory (or load-file-name buffer-file-name))
   "Directory containing this init.el and all config modules.")
 
 (defun my/load-module (name)
@@ -197,7 +197,7 @@
 ;; ---------------------------------------------------------------------------
 
 (let ((real-dir (file-name-directory
-                 (file-truename (or load-file-name buffer-file-name)))))
+                 (or load-file-name buffer-file-name))))
   (load (expand-file-name "evil-cursor.el" real-dir)))
 
 ;; ---------------------------------------------------------------------------
@@ -292,7 +292,7 @@ Re-runs setup if the terminal was visited but KKP isn't active."
 ;; ---------------------------------------------------------------------------
 
 (let ((real-dir (file-name-directory
-                 (file-truename (or load-file-name buffer-file-name)))))
+                 (or load-file-name buffer-file-name))))
   (load (expand-file-name "doom-modeline.el" real-dir)))
 
 ;; ---------------------------------------------------------------------------

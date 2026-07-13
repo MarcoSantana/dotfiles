@@ -15,6 +15,7 @@
 ;;    - Project-aware commands (detects gleam.toml root)
 ;;    - Toggle between src/ and test/ files
 ;;    - Create new projects, add dependencies
+;;    - imenu support (functions, types, constants)
 ;; =============================================================================
 
 ;; ---------------------------------------------------------------------------
@@ -28,17 +29,21 @@
   :hook (gleam-ts-mode . eglot-ensure)
   :config
   ;; ── Tree-sitter grammar ──────────────────────────────────
+  ;; gleam-ts-mode auto-selects grammar revision based on ABI version:
+  ;;   ABI < 15  → v1.0.0 (bit_string syntax)
+  ;;   ABI >= 15 → main   (bit_array syntax)
+  ;; Let the package handle this — no manual treesit-language-source-alist.
   (unless (treesit-language-available-p 'gleam)
-    (with-eval-after-load 'treesit
-      (add-to-list 'treesit-language-source-alist
-                   '(gleam . ("https://github.com/gleam-lang/tree-sitter-gleam" "v1.0.0")))
-      (gleam-ts-install-grammar)))
+    (gleam-ts-install-grammar))
 
   ;; ── Format on save (built-in) ────────────────────────────
   (setq gleam-ts-format-on-save t)
 
   ;; ── Indentation ──────────────────────────────────────────
-  (setq gleam-ts-indent-offset 2))
+  (setq gleam-ts-indent-offset 2)
+
+  ;; ── imenu — jump to functions, types, constants ──────────
+  (setq-local imenu-create-index-function #'treesit-imenu-create-index))
 
 ;; Register the Gleam LSP server for Eglot
 (with-eval-after-load 'eglot
@@ -159,24 +164,29 @@ Defaults to the current buffer's file name.  Returns nil if no
 (defvar my/gleam-lustre-dev-process nil
   "The Lustre dev server process, if running.")
 
-(defun my/gleam-lustre-dev ()
-  "Start the Lustre dev server (via `lustre_dev_tools`)."
-  (interactive)
+(defun my/gleam-lustre-dev (&optional port)
+  "Start the Lustre dev server (via `lustre_dev_tools`).
+With prefix argument PORT, specify the dev server port."
+  (interactive "P")
   (let ((root (my/gleam-project-root-or-error)))
+    ;; Kill existing if running
     (when (and my/gleam-lustre-dev-process
                (process-live-p my/gleam-lustre-dev-process))
       (delete-process my/gleam-lustre-dev-process))
-    (setq my/gleam-lustre-dev-process
-          (start-process "lustre-dev" "*gleam-lustre-dev*"
-                         "gleam" "run" "lustre_dev_tools" "dev"))
-    (set-process-sentinel
-     my/gleam-lustre-dev-process
-     (lambda (proc event)
-       (when (string-match-p "finished\\|exited" event)
-         (my/gleam--on-lustre-dev-stop)
-         (message "Lustre dev server stopped"))))
-    (message "Lustre dev server starting…")
-    (display-buffer (get-buffer-create "*gleam-lustre-dev*"))))
+    ;; Build command
+    (let* ((cmd '("gleam" "run" "lustre_dev_tools" "dev"))
+           (args (if port (append cmd (list "--port" (number-to-string port))) cmd)))
+      (setq my/gleam-lustre-dev-process
+            (apply #'start-process "lustre-dev" "*gleam-lustre-dev*"
+                   args))
+      (set-process-sentinel
+       my/gleam-lustre-dev-process
+       (lambda (proc event)
+         (when (string-match-p "finished\\|exited" event)
+           (my/gleam--on-lustre-dev-stop)
+           (message "Lustre dev server stopped"))))
+      (message "Lustre dev server starting…")
+      (display-buffer (get-buffer-create "*gleam-lustre-dev*")))))
 
 (defun my/gleam--on-lustre-dev-stop ()
   "Cleanup when Lustre dev server stops."
