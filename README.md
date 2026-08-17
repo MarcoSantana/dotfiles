@@ -55,7 +55,7 @@ theme-switch --dry-run          # preview without writing
 ## Stow Packages
 
 ```
-bash/    doom/    eww/      ghostty/  hypr/    kitty/  nvim/   rofi/    vifm/
+bash/    bat/     doom/    eww/      ghostty/  hypr/    kitty/  nvim/   rofi/    vifm/
 emacs/   firemacs/ git/    helix/    i3/      profile/ spacemacs/ tmux/  yazi/  zed/  zsh/
 ```
 

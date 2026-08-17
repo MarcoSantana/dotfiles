@@ -550,6 +550,14 @@ When called from inside dired:
   "c r" '(cider-eval-region :which-key "eval region")
   "c q" '(cider-quit :which-key "quit REPL")
 
+  ;; ── Flutter / Dart ──────────────────────────────────────────
+  "m f" '(nil :which-key "flutter")
+  "m f r" '(flutter-run-or-hot-reload :which-key "run or hot reload")
+  "m f R" '(flutter-hot-restart :which-key "hot restart")
+  "m f q" '(flutter-quit :which-key "quit")
+  "m f t" '(flutter-test-all :which-key "run tests")
+
+
   ;; ── Org / Notes ──────────────────────────────────────────────
   "n" '(nil :which-key "org / notes")
   "n c" '(org-capture :which-key "capture note/task")

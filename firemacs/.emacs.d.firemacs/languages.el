@@ -39,6 +39,23 @@
                '(typst-ts-mode . ("tinymist"))))
 
 ;; ---------------------------------------------------------------------------
+;;  Dart & Flutter — LSP + Flutter tooling
+;; ---------------------------------------------------------------------------
+(use-package dart-mode
+  :defer t
+  :mode "\\.dart\\'"
+  :hook (dart-mode . eglot-ensure))
+
+(use-package flutter
+  :defer t
+  :after dart-mode)
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(dart-mode . ("dart" "language-server" "--protocol=lsp"))))
+
+
+;; ---------------------------------------------------------------------------
 ;;  Markdown — GFM support + LSP
 ;; ---------------------------------------------------------------------------
 (use-package markdown-mode
