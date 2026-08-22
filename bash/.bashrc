@@ -120,3 +120,112 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 eval "$(~/.local/bin/mise activate)"
+
+# ─── CLI tools (mise-managed) ────────────────────────────────────────────────
+
+command -v zoxide >/dev/null && eval "$(zoxide init bash)"
+
+command -v fzf >/dev/null && {
+    eval "$(fzf --bash)"
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+    export FZF_DEFAULT_OPTS='--height=40% --layout=reverse --border --color=bg+:#292e42,spinner:#bb9af7,hl:#7aa2f7,fg:#a9b1d6,header:#7aa2f7,info:#565f89,pointer:#7dcfff,marker:#9ece6a,fg+:#c0caf5,prompt:#7dcfff,hl+:#7aa2f7'
+}
+
+command -v bat >/dev/null && alias cat='bat --paging=never'
+
+if command -v eza >/dev/null; then
+    alias ls='eza --icons=auto --group-directories-first'
+    alias ll='eza -la --icons=auto --git --group-directories-first'
+    alias la='eza -a --icons=auto --group-directories-first'
+    alias l='eza -laa --icons=auto --git --group-directories-first'
+    alias tree='eza --tree --icons=auto'
+fi
+
+command -v direnv >/dev/null && eval "$(direnv hook bash)"
+
+# opencode
+export PATH=/home/msantana/.opencode/bin:$PATH
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/msantana/.local/bin:$PATH"
+
+# ─── Prompt ──────────────────────────────────────────────────────────────────
+# Two-line prompt: time · user@host · path · git state · cmd duration · exit code
+
+PROMPT_DIRTRIM=4
+
+_prompt_timer() {
+    [[ $BASH_COMMAND == "$PROMPT_COMMAND" ]] && return
+    __prompt_t0=$EPOCHREALTIME
+}
+
+_prompt_git() {
+    GIT_PROMPT_SEG=""
+    command git rev-parse --is-inside-work-tree &>/dev/null || return 0
+    local out head branch seg
+    out=$(command git status --porcelain=v1 -b 2>/dev/null) || return 0
+    head=${out%%$'\n'*}
+    if [[ $head == '## No commits yet on '* ]]; then
+        branch="${head#'## No commits yet on '}"
+    else
+        branch=${head#'## '}
+        branch=${branch%%...*}
+        [[ $branch == 'HEAD (no branch)' ]] && branch='(detached)'
+    fi
+    [[ -n $branch ]] || return 0
+    seg=$'\[\e[38;2;187;154;247m\]'"$branch"$'\[\e[0m\]'
+    [[ $head =~ ahead\ ([0-9]+) ]] && seg+=" "$'\[\e[38;2;158;206;106m\]'"↑${BASH_REMATCH[1]}"$'\[\e[0m\]'
+    [[ $head =~ behind\ ([0-9]+) ]] && seg+=" "$'\[\e[38;2;247;118;142m\]'"↓${BASH_REMATCH[1]}"$'\[\e[0m\]'
+    local rest=${out#*$'\n'} line x y ns=0 nm=0 nu=0 nc=0
+    if [[ $rest != "$out" ]]; then
+        while IFS= read -r line; do
+            x=${line:0:1} y=${line:1:1}
+            case $x in
+                "?") ((nu++)) ;;
+                "U") ((nc++)) ;;
+                [MADRC]) ((ns++)) ;;
+            esac
+            case $y in [MDU]) ((nm++)) ;; esac
+        done <<<"$rest"
+    fi
+    ((ns)) && seg+=" "$'\[\e[38;2;224;175;104m\]'"✚$ns"$'\[\e[0m\]'
+    ((nm)) && seg+=" "$'\[\e[38;2;247;118;142m\]'"✱$nm"$'\[\e[0m\]'
+    ((nc)) && seg+=" "$'\[\e[38;2;255;121;198m\]'"✖$nc"$'\[\e[0m\]'
+    ((nu)) && seg+=" "$'\[\e[38;5;245m\]'"?$nu"$'\[\e[0m\]'
+    GIT_PROMPT_SEG=$seg
+}
+
+_prompt_command() {
+    local st=$?
+    local r=$'\[\e[0m\]' dim=$'\[\e[38;5;245m\]'
+    local blue=$'\[\e[38;2;122;162;247m\]'
+    local green=$'\[\e[38;2;158;206;106m\]'
+    local red=$'\[\e[38;2;247;118;142m\]'
+    local cyan=$'\[\e[38;2;115;218;202m\]'
+    case $TERM in xterm*|rxvt*|kitty|ghostty|screen*|tmux*|*256color*)
+        printf '\033]0;%s@%s: %s\007' "$USER" "${HOSTNAME%%.*}" "${PWD/#"$HOME"/~}" ;;
+    esac
+    _prompt_git
+    local dur=""
+    if [[ -n ${__prompt_t0:-} && -n ${EPOCHREALTIME:-} ]]; then
+        local us=$(( ${EPOCHREALTIME/./} - ${__prompt_t0/./} ))
+        if (( us > 1000000 )); then
+            printf -v dur '%d.%ds' $(( us / 1000000 )) $(( (us % 1000000) / 100000 ))
+            dur=" $dim$dur$r"
+        fi
+        __prompt_t0=
+    fi
+    local arrow=$green tail=""
+    (( st )) && { arrow=$red; tail=" $red✘ $st$r"; }
+    PS1="\n$dim╭─$r ${debian_chroot:+($debian_chroot)}$blue\t$r $dim·$r "
+    PS1+="$green\u$r@$dim\h$r $dim·$r $cyan\w$r"
+    [[ -n ${GIT_PROMPT_SEG:-} ]] && PS1+=" $GIT_PROMPT_SEG"
+    PS1+="$dur$tail"
+    PS1+="\n$dim╰─$r$arrow❯$r "
+}
+
+PROMPT_COMMAND=_prompt_command
+[[ -n ${EPOCHREALTIME:-} ]] && trap _prompt_timer DEBUG

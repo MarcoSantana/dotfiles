@@ -1,0 +1,15 @@
+# Managed with mise (https://mise.jdx.dev)
+# Run `mise install` after cloning to fetch everything.
+
+[tools]
+bat = "latest"
+delta = "latest"
+direnv = "latest"
+eza = "latest"
+fd = "latest"
+fzf = "latest"
+ripgrep = "latest"
+zoxide = "latest"
+
+[settings]
+experimental = true
