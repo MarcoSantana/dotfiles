@@ -26,6 +26,8 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-
-# Added by Antigravity CLI installer
-export PATH="/home/msantana/.local/bin:$PATH"
+# mise shims: makes toolchain binaries (node, ruby, LSPs, …) available
+# to login shells and GUI-launched apps, not just interactive bash
+if [ -d "$HOME/.local/share/mise/shims" ] ; then
+    PATH="$HOME/.local/share/mise/shims:$PATH"
+fi

@@ -5,6 +5,23 @@ gutters = ["diagnostics", "line-numbers", "spacer"]
 auto-pairs = true
 idle-timeout = 0
 rulers = [79, 119]
+text-width = 80
+cursorline = true
+color-modes = true
+bufferline = "multiple"
+
+# visually wrap long lines in every language
+[editor.soft-wrap]
+enable = true
+max-wrap = 25
+wrap-indicator = "↪ "
+
+[editor.indent-guides]
+render = true
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
 
 [editor.statusline]
 left = ["mode", "spinner"]
@@ -20,9 +37,6 @@ select = "underline"
 
 [editor.file-picker]
 hidden = false
-
-[editor.lsp]
-display-messages = true
 
 [editor.whitespace]
 render = "all"

@@ -1,0 +1,140 @@
+# ── Language servers ─────────────────────────────────────────────────────────
+
+[language-server.gopls]
+command = "gopls"
+
+[language-server.gopls.config]
+"ui.diagnostic.staticcheck" = true
+"analyses.unusedvariable" = true
+"analyses.shadow" = true
+
+[language-server.typescript-language-server.config]
+# formatting is prettier's job
+format = false
+
+[language-server.typescript-language-server.config.preferences]
+includeInlayParameterNameHints = "all"
+includeInlayParameterNameHintsWhenArgumentMatchesName = false
+includeInlayFunctionParameterTypeHints = true
+includeInlayVariableTypeHints = true
+includeInlayPropertyDeclarationTypeHints = true
+includeInlayFunctionLikeReturnTypeHints = true
+includeInlayEnumMemberValueHints = true
+
+[language-server.ruby-lsp]
+command = "ruby-lsp"
+
+[language-server.marksman]
+command = "marksman"
+
+# vls >= 0.8 renamed its binary from `vue-language-server` to `vls`
+[language-server.vls]
+command = "vls"
+
+[language-server.gleam-lsp]
+command = "gleam"
+args = ["lsp"]
+
+# ── Languages ────────────────────────────────────────────────────────────────
+
+[[language]]
+name = "go"
+auto-format = true
+formatter = { command = "gofumpt" }
+
+[[language]]
+name = "gleam"
+auto-format = true
+
+[[language]]
+name = "ruby"
+language-servers = ["ruby-lsp"]
+auto-format = true
+formatter = { command = "rubocop", args = [
+  "--stdin",
+  "file.rb",
+  "--fix-errors",
+  "--format",
+  "quiet",
+  "--stderr",
+] }
+
+# JS/TS — typescript-language-server for intelligence, prettier for format
+[[language]]
+name = "javascript"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.js",
+] }
+auto-format = true
+
+[[language]]
+name = "jsx"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.jsx",
+] }
+auto-format = true
+
+[[language]]
+name = "typescript"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.ts",
+] }
+auto-format = true
+
+[[language]]
+name = "tsx"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.tsx",
+] }
+auto-format = true
+
+[[language]]
+name = "json"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.json",
+] }
+auto-format = true
+
+[[language]]
+name = "css"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.css",
+] }
+auto-format = true
+
+[[language]]
+name = "html"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.html",
+] }
+auto-format = true
+
+# Markdown: hard-wrap prose at 80 on save, otherwise stay out of the way
+[[language]]
+name = "markdown"
+language-servers = ["marksman"]
+text-width = 80
+soft-wrap = { enable = true, wrap-at-text-width = true }
+auto-format = true
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.md",
+  "--prose-wrap",
+  "always",
+] }
+
+[[language]]
+name = "vue"
+language-servers = ["vls"]
+auto-format = true
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "file.vue",
+] }

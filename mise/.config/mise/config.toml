@@ -11,5 +11,20 @@ fzf = "latest"
 ripgrep = "latest"
 zoxide = "latest"
 
+# helix language servers & toolchains
+go = "latest"
+gleam = "latest"
+ruby = "latest"
+marksman = "latest"
+gofumpt = "latest"
+golangci-lint = "latest"
+"gem:ruby-lsp" = "latest"
+"gem:rubocop" = "latest"
+"npm:typescript" = "latest"
+"npm:typescript-language-server" = "latest"
+"npm:prettier" = "latest"
+"npm:vscode-langservers-extracted" = "latest"
+"npm:vls" = "latest"
+
 [settings]
 experimental = true
