@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 # --- Multi-Emacs Manager (Gum Edition) ---
-# A pretty CLI to manage Spacemacs, Doom, Crafted, and Centaur.
+# A pretty CLI to manage Spacemacs, Doom, Crafted, Centaur, Firemacs, and Neomacs.
 
 set -e
 
 # --- Configuration ---
-DISTROS=("spacemacs" "doom" "crafted" "centaur" "firemacs")
+DISTROS=("spacemacs" "doom" "crafted" "centaur" "firemacs" "neomacs")
 BIN_DIR="$HOME/.local/bin"
 SCRIPT_PATH="$BIN_DIR/emacs-manager"
 
@@ -80,7 +80,9 @@ launch_client() {
 
     case "$MODE" in
         "🖥 GUI Frame")
-            if [ "$DISTRO" == "doom" ]; then
+            if [ "$DISTRO" == "neomacs" ]; then
+                neomacs --init-directory ~/.emacs.d.firemacs &
+            elif [ "$DISTRO" == "doom" ]; then
                 EMACSDIR=~/.emacs.d.doom DOOMDIR=~/.doom.d emacsclient -c -n -s doom -a "" &
             elif [ "$DISTRO" == "firemacs" ]; then
                 emacsclient -c -n -s firemacs -a "" &
@@ -89,7 +91,9 @@ launch_client() {
             fi
             ;;
         "⌨ Terminal Frame")
-            if [ "$DISTRO" == "doom" ]; then
+            if [ "$DISTRO" == "neomacs" ]; then
+                neomacs -nw --init-directory ~/.emacs.d.firemacs
+            elif [ "$DISTRO" == "doom" ]; then
                 EMACSDIR=~/.emacs.d.doom DOOMDIR=~/.doom.d emacsclient -t -s doom -a ""
             elif [ "$DISTRO" == "firemacs" ]; then
                 emacsclient -t -s firemacs -a ""
@@ -150,10 +154,13 @@ open_config() {
         crafted)   FILE="$HOME/.emacs.d.crafted/init.el" ;;
         centaur)   FILE="$HOME/.emacs.d.centaur/custom.el" ;;
         firemacs)  FILE="$HOME/.emacs.d.firemacs/init.el" ;;
+        neomacs)   FILE="$HOME/.emacs.d.firemacs/init.el" ;;
     esac
     
     # Open in current terminal with the distro itself
-    if [ "$DISTRO" == "doom" ]; then
+    if [ "$DISTRO" == "neomacs" ]; then
+        neomacs -nw --init-directory ~/.emacs.d.firemacs "$FILE"
+    elif [ "$DISTRO" == "doom" ]; then
         EMACSDIR=~/.emacs.d.doom DOOMDIR=~/.doom.d emacsclient -t -s doom -a "" "$FILE"
     else
         emacsclient -t -s "$DISTRO" -a "" "$FILE"

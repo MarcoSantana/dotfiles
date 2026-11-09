@@ -74,6 +74,21 @@ emacs/   firemacs/ git/    helix/    i3/      profile/ spacemacs/ tmux/  yazi/  
 - **doom**: `~/.doom.d` — gleam-ts-mode + lsp-deferred
 - **spacemacs**: `~/.spacemacs` — gleam layer
 - **firemacs**: `~/.emacs.d.firemacs` — gleam-ts-mode + eglot-ensure
+- **neomacs**: GPU-powered Emacs (Rust) reusing the firemacs config — `emacs-neomacs.service`
+
+### Spelling & Grammar (firemacs + neomacs)
+
+`spell.el` gives flyspell (spelling) + LanguageTool (grammar) in English and Spanish.
+
+| Key | Action |
+|---|---|
+| `SPC t s` | toggle spelling on/off |
+| `SPC t g` | run / clear grammar check |
+| `SPC t L` | switch language es ↔ en |
+
+- Spelling: `aspell` (`aspell-en`, `aspell-es`).
+- Grammar: LanguageTool 6.6 at `/extra/languagetool/` (Java 21) via the `langtool` package.
+- Spelling auto-enables in prose buffers (org, markdown, text, typst, latex).
 
 ## NVIDIA Notes (HP OMEN 15-dc1xxx)
 

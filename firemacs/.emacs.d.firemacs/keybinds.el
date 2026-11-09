@@ -511,6 +511,9 @@ When called from inside dired:
   "t p" '(pi-coding-agent-toggle :which-key "toggle AI windows")
   "t e" '(my/eat-compose :which-key "compose in terminal")
   "t c" '(typst-ts-mode-compile :which-key "compile typst document")
+  "t s" '(my/spell-toggle :which-key "toggle spelling")
+  "t g" '(my/grammar-toggle :which-key "toggle grammar")
+  "t L" '(my/prose-toggle-language :which-key "toggle language es/en")
 
   ;; ── Help / Docs ──────────────────────────────────────────────
   "d" '(nil :which-key "help / docs")

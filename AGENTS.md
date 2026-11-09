@@ -92,6 +92,16 @@ Each exports `TH_BG`, `TH_FG`, `TH_ACCENT`, `TH_BLACK`, `TH_RED`, `TH_GREEN`,
   symlink resolution).
 - Only 3 Emacs flavors actively supported: doom, firemacs, spacemacs (centaur
   and crafted are legacy — kept for compatibility but not recommended).
+- Neomacs (GPU Emacs in Rust) runs as `emacs-neomacs.service` (stow-managed under
+  `firemacs/`) and **shares** the firemacs config dir `~/.emacs.d.firemacs` — no
+  separate config. Launch via `emacs-manager` (neomacs entry) or directly
+  `neomacs --init-directory ~/.emacs.d.firemacs` / `neomacs -nw …`.
+  `neomacsclient` 0.0.20 has no `-c`/`-t` frame flags yet, so GUI/TTY use direct
+  launch, not the daemon client.
+- Spelling/grammar lives in `firemacs/.emacs.d.firemacs/spell.el`: flyspell +
+  `aspell` (es/en, `aspell-en`/`aspell-es`) and `langtool` + LanguageTool 6.6 at
+  `/extra/languagetool/LanguageTool-6.6/languagetool-commandline.jar` (needs
+  Java 21). Toggles: `SPC t s` (spell), `SPC t g` (grammar), `SPC t L` (language).
 - Par clon: `emacs-daemons.sh` `clone-only` action for parallel clones.
 - `hypridle.conf` uses `idle-guard.sh` which checks `playerctl --all-players
   status` before DPMS/lock.

@@ -67,6 +67,9 @@
 (my/load-module "dired.el")          ;; Dired customizations
 (my/load-module "diff-hl.el")        ;; Highlight uncommitted changes
 
+;; ── Writing (spelling & grammar, es/en) ─────────────────────
+(my/load-module "spell.el")          ;; flyspell + LanguageTool with toggles
+
 ;; ── Languages ───────────────────────────────────────────────
 (my/load-module "julia.el")         ;; Julia tree-sitter mode
 (my/load-module "languages.el")     ;; Vue, Clojure, Typst, Markdown, SQL
