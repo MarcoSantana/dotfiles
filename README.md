@@ -32,6 +32,8 @@ theme-switch                          # set colors after first Hyprland login
 | `idle-guard.sh` | Media-aware DPMS/lock guard (used by hypridle) |
 | `terminal.sh` | Consolidates terminal tool APT install |
 | `zsh-fzf.sh` | ZSH + FZF setup |
+| `docz.py` | Exam `.docx` → `.docx.txt` converter (exam pipeline) — symlinked to `~/.local/bin/docz.py` |
+| `docx_page_images.py` | Extract displayed images from exam `.docx` as PNG/WebP — symlinked to `~/.local/bin/docx_page_images.py` |
 
 ## Theme System
 
